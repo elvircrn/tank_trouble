@@ -1,6 +1,8 @@
 package com.elvircrn.TankTrouble;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -23,13 +25,42 @@ public class Tank extends GameObject {
 
     }
 
-    public void Update(float deltaTime) {
+    public void Update(float deltaTime, Level level) {
         Vector2 direction = MyGdxGame.joystick.GetNorDirection();
-        WorldLocation.add(new Vector2(direction.x * Speed, direction.y * Speed));
+        Vector2 res = direction.scl(Speed);
+        Circle collisionCircle = new Circle((float)WorldLocation.x + res.x + texture.getWidth() / 2, (float)WorldLocation.y + res.y + texture.getWidth() / 2, (float)texture.getWidth() / 2);
+
+        Vector2 worldLocation = new Vector2((float)WorldLocation.x + texture.getWidth() / 2, (float)WorldLocation.y + texture.getWidth() / 2);
+
+        for (Rectangle rec : level.walls) {
+            if (com.badlogic.gdx.math.Intersector.overlaps(collisionCircle, rec)) {
+                return;
+            }
+        }
+
+        WorldLocation.add(res);
+
+        if (Input.TouchList.size() > 0)
+            Rotation = MyGdxGame.joystick.GetNorDirection().angle();
     }
 
     public void Draw(Batch batch) {
-        batch.draw(texture, WorldLocation.x, WorldLocation.y);
+        batch.draw(texture,
+            WorldLocation.x,
+            WorldLocation.y,
+            texture.getWidth() / 2,
+            texture.getHeight() / 2,
+            texture.getWidth(),
+            texture.getHeight(),
+            1.0f,
+            1.0f,
+            Rotation,
+            0,
+            0,
+            0,
+            0,
+            false,
+            false);
     }
 
 }

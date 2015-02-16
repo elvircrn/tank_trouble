@@ -24,7 +24,6 @@ public class Input {
                 float locX = (float)Gdx.input.getX(i);
                 float locY = (float)Gdx.input.getY(i);
 
-
                 locY = MyGdxGame.h - locY;
 
                 locX = (locX / MyGdxGame.w) * MyGdxGame.PrefferedWidth;

@@ -1,6 +1,5 @@
 package com.elvircrn.TankTrouble;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
@@ -51,7 +50,7 @@ public class Joystick {
 
         batch.draw(texture, Center.x - largeWidth / 2, Center.y - largeHeight / 2, largeWidth, largeHeight);
         batch.draw(texture, Location.x - Width / 2, Location.y - Height / 2, Width, Height);
-        //batch.draw(texture, MyGdxGame.PrefferedWidth - Center.x, Center.y, Width, Height);
+        batch.draw(texture, MyGdxGame.PrefferedWidth - Center.x, Center.y, Width, Height);
     }
 
     public Rectangle GetButtonRectangle() {
@@ -66,11 +65,11 @@ public class Joystick {
         Vector2 tl = new Vector2(touchLocation.x, touchLocation.y);
         Vector2 d = tl.sub(Center);
 
-        Gdx.app.log("at center before()", "center.x: " + Float.toString(Center.x) + "  center.y: " + Float.toString(Center.y));
+        //Gdx.app.log("at center before()", "center.x: " + Float.toString(Center.x) + "  center.y: " + Float.toString(Center.y));
 
         float distance = Center.dst(tl);
 
-        Gdx.app.log("at centerbefore()", "center.x: " + Float.toString(Center.x) + "  center.y: " + Float.toString(Center.y));
+        //Gdx.app.log("at centerbefore()", "center.x: " + Float.toString(Center.x) + "  center.y: " + Float.toString(Center.y));
 
         d.nor();
         Vector2 normalized = d;
@@ -94,7 +93,7 @@ public class Joystick {
         for (int i = 0; i < Input.TouchList.size(); i++) {
             Vector2 touchPoint = Input.TouchList.get(i);
             if (GetButtonRectangle().contains(touchPoint)) {
-                //TODO: Fire bullet logic.
+                MyGdxGame.level.generateLevel(5, 5);
             }
             else {
                 found = true;
