@@ -129,11 +129,11 @@ public class Level {
     }
 
     public static int getMapPixelWidth() {
-        return (int)tileToScreen(width, 0).x - (int)tileToScreen(0, 0).x;
+        return width * getTileDimens() + wallWidth * width;
     }
 
     public static int getMapPixelHeight() {
-        return (int)tileToScreen(0, height).x - (int)tileToScreen(0, 0).y;
+        return height * getTileDimens() + wallWidth * height;
     }
 
     public static void Draw(SpriteBatch batch) {
@@ -215,8 +215,13 @@ public class Level {
             }
         }
 
-        walls.add(new Wall((int)offset.x, (int)MyGdxGame.PrefferedHeight, getMapPixelWidth(), wallWidth, HORIZONTAL));
+        Gdx.app.log("top wall: ", "offset.x: " + Integer.toString((int)offset.x) +
+                                  "MyGdxGame.PrefferedHeight: " + Integer.toString((int)MyGdxGame.PrefferedHeight) +
+                                  "getMapPixelWidth(): " + Integer.toString(getMapPixelWidth()));
+
+        walls.add(new Wall((int)offset.x, (int)MyGdxGame.PrefferedHeight - wallWidth, getMapPixelWidth(), wallWidth, HORIZONTAL));
         walls.add(new Wall((int)offset.x + getMapPixelWidth() - wallWidth, 0, wallWidth, getMapPixelHeight(), VERTICAL));
+        walls.add(new Wall((int)offset.x, 0, getMapPixelWidth(), wallWidth, HORIZONTAL));
 
         Gdx.app.log("getTileDimens(): ", Integer.toString(getTileDimens()));
 
@@ -228,9 +233,8 @@ public class Level {
 
 
         for (Wall wall : walls) {
-
-            Gdx.app.log("RECTANGLE: ", "x: " + Integer.toString((int)wall.getCollisionRectangle().x) + " y: " + Integer.toString((int)wall.getCollisionRectangle().y) + " width: " +
-                                       Integer.toString((int)wall.getCollisionRectangle().getWidth()) + " height: "  + Integer.toString((int)wall.getCollisionRectangle().getHeight()));
+            //Gdx.app.log("RECTANGLE: ", "x: " + Integer.toString((int)wall.getCollisionRectangle().x) + " y: " + Integer.toString((int)wall.getCollisionRectangle().y) + " width: " +
+            //                           Integer.toString((int)wall.getCollisionRectangle().getWidth()) + " height: "  + Integer.toString((int)wall.getCollisionRectangle().getHeight()));
         }
     }
 

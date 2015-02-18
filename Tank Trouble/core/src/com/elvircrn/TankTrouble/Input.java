@@ -39,5 +39,4 @@ public class Input {
             Gdx.app.log(tag, Float.toString(current_element.x) + "  " + Float.toString(current_element.y));
         }
     }
-
 }

@@ -10,11 +10,12 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class Joystick {
 
+    public int index;
+
     //analog
     public Vector2 Center, Location;
     public Texture texture;
     public float analogRadius;
-
 
     //fire button
     public Vector2 ButtonLocation;
@@ -25,10 +26,7 @@ public class Joystick {
         return Center.x / 2.0f;
     }
 
-    public Joystick(Texture texture, Vector2 centerLocation, Vector2 ButtonLocation) {
-        //Center = centerLocation;
-        //Location = Center;
-
+    public Joystick(Texture texture, Vector2 centerLocation, Vector2 ButtonLocation, int index) {
         Center = new Vector2();
 
         Center.x = MyGdxGame.w / 15.f + 30.0f;
@@ -37,12 +35,20 @@ public class Joystick {
         Width  = 64.0f;
         Height = 64.0f;
 
-        Location = Center;
-
         analogRadius = 80.0f;
 
         this.texture = texture;
-        this.ButtonLocation = new Vector2(MyGdxGame.w - Center.x, Center.y);
+        this.ButtonLocation = new Vector2(Center.x, MyGdxGame.PrefferedHeight - Center.y);
+
+        if (index == 1)
+            this.ButtonLocation = new Vector2(Center.x, MyGdxGame.PrefferedHeight - Center.y);
+        else
+            this.ButtonLocation = new Vector2(Center.x, MyGdxGame.PrefferedHeight - Center.y);
+
+        if (index == 2)
+            Center = new Vector2(MyGdxGame.PrefferedWidth - Center.x, MyGdxGame.PrefferedHeight - Center.y);
+
+        Location = Center;
     }
 
     public void Draw(Batch batch) {
@@ -63,20 +69,19 @@ public class Joystick {
 
     public void UpdateLocation(Vector2 touchLocation) {
         Vector2 tl = new Vector2(touchLocation.x, touchLocation.y);
+        float distance = (float)Math.sqrt((Center.x - tl.x) * (Center.x - tl.x) + (Center.y - tl.y) * (Center.y - tl.y));
         Vector2 d = tl.sub(Center);
-
-        //Gdx.app.log("at center before()", "center.x: " + Float.toString(Center.x) + "  center.y: " + Float.toString(Center.y));
-
-        float distance = Center.dst(tl);
-
-        //Gdx.app.log("at centerbefore()", "center.x: " + Float.toString(Center.x) + "  center.y: " + Float.toString(Center.y));
 
         d.nor();
         Vector2 normalized = d;
 
-        normalized = new Vector2(normalized.x * analogRadius, normalized.y * analogRadius);
+        if (distance > analogRadius)
+            distance = analogRadius;
 
-        Vector2 centercopy = new Vector2(Center.x, Center.y);;
+
+        normalized = new Vector2(normalized.x * distance, normalized.y * distance);
+
+        Vector2 centercopy = new Vector2(Center.x, Center.y);
 
         centercopy.add(normalized);
 
@@ -92,13 +97,16 @@ public class Joystick {
         boolean found = false;
         for (int i = 0; i < Input.TouchList.size(); i++) {
             Vector2 touchPoint = Input.TouchList.get(i);
+            if (index == 2 && touchPoint.x < (MyGdxGame.PrefferedWidth / 2) ||
+                index == 1 && (MyGdxGame.PrefferedWidth / 2) < touchPoint.x)
+                continue;
+
             if (GetButtonRectangle().contains(touchPoint)) {
-                Level.generateLevel(5, 5);
+                LevelManager.initGame();
             }
             else {
-                found = true;
                 UpdateLocation(touchPoint);
-                break;
+                found = true;
             }
         }
 
