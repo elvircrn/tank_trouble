@@ -93,7 +93,7 @@ public class Joystick {
         for (int i = 0; i < Input.TouchList.size(); i++) {
             Vector2 touchPoint = Input.TouchList.get(i);
             if (GetButtonRectangle().contains(touchPoint)) {
-                MyGdxGame.level.generateLevel(5, 5);
+                Level.generateLevel(5, 5);
             }
             else {
                 found = true;

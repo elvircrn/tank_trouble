@@ -2,7 +2,6 @@ package com.elvircrn.TankTrouble;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -25,15 +24,15 @@ public class Tank extends GameObject {
 
     }
 
-    public void Update(float deltaTime, Level level) {
+    public void Update(float deltaTime) {
         Vector2 direction = MyGdxGame.joystick.GetNorDirection();
         Vector2 res = direction.scl(Speed);
         Circle collisionCircle = new Circle((float)WorldLocation.x + res.x + texture.getWidth() / 2, (float)WorldLocation.y + res.y + texture.getWidth() / 2, (float)texture.getWidth() / 2);
 
         Vector2 worldLocation = new Vector2((float)WorldLocation.x + texture.getWidth() / 2, (float)WorldLocation.y + texture.getWidth() / 2);
 
-        for (Rectangle rec : level.walls) {
-            if (com.badlogic.gdx.math.Intersector.overlaps(collisionCircle, rec)) {
+        for (Wall wall : Level.walls) {
+            if (com.badlogic.gdx.math.Intersector.overlaps(collisionCircle, wall.getCollisionRectangle())) {
                 return;
             }
         }
