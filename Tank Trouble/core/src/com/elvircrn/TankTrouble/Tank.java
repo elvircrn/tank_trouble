@@ -37,15 +37,15 @@ public class Tank extends GameObject {
         Gdx.app.log("tank shoot", "Shoot()");
 
         if (index == 1)
-            BulletManager.addBullet(new Bullet(new Vector2(collisionCircle.x + MyGdxGame.joystickOne.lastDirection.x * (collisionCircle.radius + 10), collisionCircle.y + MyGdxGame.joystickOne.lastDirection.y * (collisionCircle.radius + 10)), MyGdxGame.joystickOne.GetNorDirection()));
+            BulletManager.addBullet(new Bullet(new Vector2(collisionCircle.x + MyGdxGame.joystickOne.lastDirection.x * (collisionCircle.radius + 2), collisionCircle.y + MyGdxGame.joystickOne.lastDirection.y * (collisionCircle.radius + 2)), MyGdxGame.joystickOne.GetNorDirection()));
         else
-            BulletManager.addBullet(new Bullet(new Vector2(collisionCircle.x + MyGdxGame.joystickTwo.lastDirection.x * (collisionCircle.radius + 10), collisionCircle.y + MyGdxGame.joystickTwo.lastDirection.y * (collisionCircle.radius + 10)), MyGdxGame.joystickTwo.GetNorDirection()));
+            BulletManager.addBullet(new Bullet(new Vector2(collisionCircle.x + MyGdxGame.joystickTwo.lastDirection.x * (collisionCircle.radius + 2), collisionCircle.y + MyGdxGame.joystickTwo.lastDirection.y * (collisionCircle.radius + 2)), MyGdxGame.joystickTwo.GetNorDirection()));
     }
 
     public void initLoc() {
         collisionCircle.x = WorldLocation.x + width / 2;
         collisionCircle.y = WorldLocation.y  + width / 2;
-        collisionCircle.radius = (float)Math.sqrt(width * width + height * height);
+        collisionCircle.radius = ((float)Math.sqrt(width * width + height * height)) / 2;
     }
 
     public void Update(float deltaTime) {
