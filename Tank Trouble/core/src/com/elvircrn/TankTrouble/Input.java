@@ -12,14 +12,19 @@ public class Input {
 
     public static ArrayList<Vector2> TouchList;
 
-    public static void Init() {
+    public static void InitTouch() {
         TouchList = new ArrayList<Vector2>();
+    }
+
+    public static void InitJoystick() {
+        MyGdxGame.joystickOne = new Joystick(1);
+        MyGdxGame.joystickTwo = new Joystick(2);
     }
 
     public static void Update() {
         TouchList.clear();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 7; i++) {
             if (Gdx.input.isTouched(i)) {
                 float locX = (float)Gdx.input.getX(i);
                 float locY = (float)Gdx.input.getY(i);
@@ -33,10 +38,10 @@ public class Input {
         }
     }
 
-    public static void Debug(String tag) {
-        for (int i = 0; i < TouchList.size(); i++) {
-            Vector2 current_element = TouchList.get(i);
-            Gdx.app.log(tag, Float.toString(current_element.x) + "  " + Float.toString(current_element.y));
-        }
+    public static void Debug() {
+        if (MyGdxGame.joystickOne.justPressed())
+            Gdx.app.log("joystickOne:", "just pressed");
+        else if (MyGdxGame.joystickTwo.justPressed())
+            Gdx.app.log("joystickTwo:", "just pressed");
     }
 }
