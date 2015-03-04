@@ -12,7 +12,7 @@ public class LevelManager {
     public static void initGame() {
 
         scale = MyGdxGame.PrefferedWidth / MyGdxGame.w;
-        int levelWidth = Random.getRange(6, 8), levelHeight = Random.getRange(4, 6);
+        int levelWidth = Random.getRange(10 - 4, 8), levelHeight = Random.getRange(4, 6);
 
         int dim;
 
