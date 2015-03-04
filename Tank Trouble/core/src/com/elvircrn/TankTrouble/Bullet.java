@@ -25,21 +25,23 @@ public class Bullet {
     public Vector2 worldLocation;
     public Vector2 direction;
 
-    public static float bulletSpeed = 250.0f;
+    public static float bulletSpeed = 170.0f;
     public Vector2 ForceAccum, Direction;
+
+    public Rectangle worldRectangle;
 
     public int notHit;
 
-    public Bullet() { }
     public Bullet(Vector2 location, Vector2 direction) {
         worldLocation = new Vector2 (location.x, location.y);
         this.direction = new Vector2 (direction.x, direction.y);
         expiration = bulletExpiration;
         notHit = 0;
+        worldRectangle = new Rectangle();
     }
 
     public Rectangle getWorldRectangle() {
-        return new Rectangle(worldLocation.x - bulletWidth / 2, worldLocation.y - bulletWidth / 2, bulletWidth, bulletWidth);
+        return worldRectangle;
     }
 
     public static void initScale(float scale) {
@@ -68,6 +70,7 @@ public class Bullet {
             worldLocation.sub(direction.x * scaledSpeed, 0);
             direction.x *= -1;
             worldLocation.add(direction.x * scaledSpeed, direction.y * scaledSpeed);
+            worldRectangle.set(worldLocation.x - bulletWidth / 2, worldLocation.y - bulletWidth / 2, bulletWidth, bulletWidth);
             return true;
         }
 
@@ -75,6 +78,8 @@ public class Bullet {
 
         worldLocation.sub(direction.x, 0);
         worldLocation.add(0, direction.y * scaledSpeed);
+
+        worldRectangle.set(worldLocation.x - bulletWidth / 2, worldLocation.y - bulletWidth / 2, bulletWidth, bulletWidth);
 
         newDirection = getNewDirection();
 
@@ -86,6 +91,8 @@ public class Bullet {
 
         Circle oneCollision = MyGdxGame.tankOne.getCollisionCircle();
         Circle twoCollision = MyGdxGame.tankTwo.getCollisionCircle();
+
+        worldRectangle.set(worldLocation.x - bulletWidth / 2, worldLocation.y - bulletWidth / 2, bulletWidth, bulletWidth);
 
         if (Intersector.overlaps(oneCollision, getWorldRectangle())) {
             MyGdxGame.tankOne.dead = true;
@@ -101,10 +108,8 @@ public class Bullet {
     }
 
     protected int getNewDirection() {
-        Rectangle bulletRectangle = getWorldRectangle();
-
         for (int i = 0; i < Level.walls.size(); i++) {
-            if (Intersector.overlaps(Level.walls.get(i).getCollisionRectangle(), bulletRectangle)) {
+            if (Intersector.overlaps(Level.walls.get(i).getCollisionRectangle(), worldRectangle)) {
                 return Level.walls.get(i).wallType;
             }
         }

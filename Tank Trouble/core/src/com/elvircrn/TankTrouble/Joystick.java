@@ -33,8 +33,8 @@ public class Joystick {
 
         texture = joyTexture;
 
-        joyWidth  = 64.0f;
-        joyHeight = 64.0f;
+        joyWidth  = 80.0f;
+        joyHeight = 80.0f;
 
         analogRadius = 80.0f;
 

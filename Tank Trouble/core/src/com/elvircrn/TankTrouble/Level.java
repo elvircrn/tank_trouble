@@ -34,7 +34,7 @@ public class Level {
     public static int height, width;
     public static Tile[][] Tiles;
 
-    public Level() { }
+    private Level() { }
 
     public static void set_priorities(int width, int height) {
         for (int i = 0; i < width; i++)
@@ -149,19 +149,6 @@ public class Level {
     }
 
     public static void Draw(SpriteBatch batch) {
-        /*for (int i = 0; i < width; i++) {
-            for (int j = 0 ; j < height; j++) {
-                int locX = (int)offset.x + i * getTileDimens() + wallWidth * i;
-                int locY = (j * getTileDimens() + wallWidth * (j + 1));
-
-                for (int k = 0; k < 4; k++)
-                    if (Tiles[i] [j].wallAt(k))
-                        drawWall(batch, locX, locY, k);
-
-                //batch.draw(tileTexture, locX, locY, getTileDimens(), getTileDimens());
-            }
-        }*/
-
         for (Wall wall : walls) {
             batch.draw(wallTexture, wall.x, wall.y, wall.width, wall.height);
         }
@@ -228,16 +215,6 @@ public class Level {
         newWalls.add(new Wall((int)offset.x, (int)MyGdxGame.PrefferedHeight - wallWidth, getMapPixelWidth(), wallWidth, HORIZONTAL));
         newWalls.add(new Wall((int)offset.x + getMapPixelWidth() - wallWidth, 0, wallWidth, getMapPixelHeight(), VERTICAL));
         newWalls.add(new Wall((int)offset.x, 0, getMapPixelWidth(), wallWidth, HORIZONTAL));
-
-        /* DEBUG WALLS
-        Gdx.app.log("getTileDimens(): ", Integer.toString(getTileDimens()));
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                Gdx.app.log("|||", "(" + Integer.toString(i) + ", " + Integer.toString(j) + "): " + tileToScreen(i, j).toString());
-            }
-        }
-        */
 
         for (Wall wall : newWalls)
             if (wall.width > 2 * wallWidth || wall.height > 2 * wallWidth)

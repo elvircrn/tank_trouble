@@ -10,18 +10,20 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class Tank extends GameObject {
 
+
+
     public int points = 0;
 
     public boolean dead;
 
     float Rotation = 0.0f;
-    float Speed = 190.0f;
+    float Speed = 50;
 
     public int width, height;
 
     public int index;
 
-    private Circle collisionCircle;
+    public Circle collisionCircle;
 
     public Tank() { }
     public Tank(int width, int height) { this.width = width; this.height = height; }
@@ -43,13 +45,11 @@ public class Tank extends GameObject {
     }
 
     public void initLoc() {
-        collisionCircle.x = WorldLocation.x + width / 2;
-        collisionCircle.y = WorldLocation.y  + width / 2;
-        collisionCircle.radius = ((float)Math.sqrt(width * width + height * height)) / 2;
+        Rotation = 0.0f;
+        collisionCircle.radius = ((float)Math.sqrt(2 * width * width)) / 2;
     }
 
     public void Update(float deltaTime) {
-
         if (index == 1 && !MyGdxGame.joystickOne.analogMoved() ||
             index == 2 && !MyGdxGame.joystickTwo.analogMoved())
             return;
@@ -62,17 +62,16 @@ public class Tank extends GameObject {
         else
             direction = MyGdxGame.joystickTwo.GetNorDirection();
 
-        collisionCircle.x = WorldLocation.x + (direction.x * scaledSpeed) + width / 2;
-        collisionCircle.y = WorldLocation.y + (direction.y * scaledSpeed) + width / 2;
-        collisionCircle.radius = (float)width / 2;
+        collisionCircle.x += (direction.x * scaledSpeed);
+        collisionCircle.y += (direction.y * scaledSpeed);
 
-        for (Wall wall : Level.walls) {
+        /*for (Wall wall : Level.walls) {
             if (com.badlogic.gdx.math.Intersector.overlaps(collisionCircle, wall.getCollisionRectangle())) {
+                collisionCircle.x -= (direction.x * scaledSpeed);
+                collisionCircle.y -= (direction.y * scaledSpeed);
                 return;
             }
-        }
-
-        WorldLocation.add(direction.x * scaledSpeed, direction.y * scaledSpeed);
+        }*/
 
         if (index == 1 && MyGdxGame.joystickOne.analogMoved())
             Rotation = MyGdxGame.joystickOne.GetNorDirection().angle();
@@ -82,21 +81,21 @@ public class Tank extends GameObject {
 
     public void Draw(Batch batch) {
         batch.draw(texture,
-            WorldLocation.x,
-            WorldLocation.y,
-            width / 2,
-            height / 2,
-            width,
-            height,
-            1.0f,
-            1.0f,
-            Rotation,
-            0,
-            0,
-            0,
-            0,
-            false,
-            false);
+                   collisionCircle.x - width / 2,
+                   collisionCircle.y - width / 2,
+                   width / 2,
+                   width / 2,
+                   width,
+                   width,
+                   1.0f,
+                   1.0f,
+                   Rotation,
+                   0,
+                   0,
+                   texture.getWidth(),
+                   texture.getHeight(),
+                   false,
+                   false);
     }
 
     public Circle getCollisionCircle() {
