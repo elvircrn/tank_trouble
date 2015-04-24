@@ -1,85 +1,109 @@
 package com.elvircrn.TankTrouble;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 
 /**
  * Created by elvircrn on 2/14/2015.
  */
-public class Tank extends GameObject {
+public class Tank {
+    //static values
+    public static float tankSpeed = 100.0f;
+    public Texture texture;
 
+    //static properties
+    public void setTexture(Texture texture) {
+        this.texture = texture;
+    }
 
-
-    public int points = 0;
-
-    public boolean dead;
-
-    float Rotation = 0.0f;
-    float Speed = 50;
-
-    public int width, height;
-
+    //instance values
     public int index;
+    public int points;
 
-    public Circle collisionCircle;
+    //collision
+    public Vector2 worldLocation;
+    public float collisionRadius;
+    public float width, height;
+    public float rotation;
 
-    public Tank() { }
-    public Tank(int width, int height) { this.width = width; this.height = height; }
+    protected Vector2 moveDirection;
+    protected Circle collisionCircle;
 
-    void init(int width, int height) {
-        dead = false;
-        this.width = width;
-        this.height = height;
+    public Tank() { moveDirection = new Vector2(); collisionCircle = new Circle(); worldLocation = new Vector2(); }
+    public Tank(int index, Vector2 startLocation, float startRotation, float tankWidth, float tankHeight) {
+        this();
+        init(index, startLocation, startRotation, tankWidth, tankHeight);
+    }
+
+    public void init(int index, Vector2 startLocation, float startRotation, float tankWidth, float tankHeight) {
+        this.index = index;
+        points = 0;
         collisionCircle = new Circle();
+        worldLocation = new Vector2();
+        worldLocation = startLocation;
+        rotation = startRotation;
+        width = tankWidth;
+        height = tankHeight;
+        initCollisionCircle();
+        moveDirection.set(0, 1);
     }
 
-    public void Shoot() {
-        Gdx.app.log("tank shoot", "Shoot()");
-
-        if (index == 1)
-            BulletManager.addBullet(new Bullet(new Vector2(collisionCircle.x + MyGdxGame.joystickOne.lastDirection.x * (collisionCircle.radius + 2), collisionCircle.y + MyGdxGame.joystickOne.lastDirection.y * (collisionCircle.radius + 2)), MyGdxGame.joystickOne.GetNorDirection()));
-        else
-            BulletManager.addBullet(new Bullet(new Vector2(collisionCircle.x + MyGdxGame.joystickTwo.lastDirection.x * (collisionCircle.radius + 2), collisionCircle.y + MyGdxGame.joystickTwo.lastDirection.y * (collisionCircle.radius + 2)), MyGdxGame.joystickTwo.GetNorDirection()));
+    private void initCollisionCircle() {
+        collisionRadius = (float)Math.sqrt((double)(width * width + height * height)) / 2.0f;
+        collisionCircle.set(worldLocation.x, worldLocation.y, collisionRadius);
     }
 
-    public void initLoc() {
-        Rotation = 0.0f;
-        collisionCircle.radius = ((float)Math.sqrt(2 * width * width)) / 2;
+    public Circle getCollisionCircle() {
+        collisionCircle.set(worldLocation.x, worldLocation.y, collisionRadius);
+        return collisionCircle;
     }
 
-    public void Update(float deltaTime) {
-        if (index == 1 && !MyGdxGame.joystickOne.analogMoved() ||
-            index == 2 && !MyGdxGame.joystickTwo.analogMoved())
-            return;
-
-        float scaledSpeed = Speed * deltaTime;
-
-        Vector2 direction;
-        if (index == 1)
-            direction = MyGdxGame.joystickOne.GetNorDirection();
-        else
-            direction = MyGdxGame.joystickTwo.GetNorDirection();
-
-        collisionCircle.x += (direction.x * scaledSpeed);
-        collisionCircle.y += (direction.y * scaledSpeed);
-
-        /*for (Wall wall : Level.walls) {
-            if (com.badlogic.gdx.math.Intersector.overlaps(collisionCircle, wall.getCollisionRectangle())) {
-                collisionCircle.x -= (direction.x * scaledSpeed);
-                collisionCircle.y -= (direction.y * scaledSpeed);
-                return;
-            }
-        }*/
-
-        if (index == 1 && MyGdxGame.joystickOne.analogMoved())
-            Rotation = MyGdxGame.joystickOne.GetNorDirection().angle();
-        if (index == 2 && MyGdxGame.joystickTwo.analogMoved())
-            Rotation = MyGdxGame.joystickTwo.GetNorDirection().angle();
+    public void shoot() {
+        float r = getCollisionCircle().radius + 5;
+        BulletManager.addBullet(worldLocation.x + moveDirection.x * r, worldLocation.y + moveDirection.y * r, moveDirection.x, moveDirection.y);
     }
 
-    public void Draw(Batch batch) {
+    public void update(float deltaTime) {
+        if (JoystickManager.get(index).moving()) {
+            rotation = JoystickManager.get(index).analog.getNorAngle();
+
+            float scaledSpeed = tankSpeed * deltaTime;
+
+            moveDirection.set(JoystickManager.get(index).analog.getNorDirection());
+
+            boolean intersectX = false, intersectY = false;
+
+            /*for (Wall wall : Level.walls) {
+                worldLocation.x += (moveDirection.x * scaledSpeed);
+
+                if (Intersector.overlaps(getCollisionCircle(), wall.getCollisionRectangle()))
+                    intersectX = true;
+
+                worldLocation.x -= (moveDirection.x * scaledSpeed);
+                worldLocation.y += (moveDirection.y * scaledSpeed);
+
+                if (Intersector.overlaps(getCollisionCircle(), wall.getCollisionRectangle()))
+                    intersectY = true;
+
+                worldLocation.y -= (moveDirection.y * scaledSpeed);
+
+                if (intersectX && intersectY)
+                    break;
+            }*/
+
+            if (!intersectX)
+                worldLocation.x += moveDirection.x * scaledSpeed;
+            if (!intersectY)
+                worldLocation.y += moveDirection.y * scaledSpeed;
+        }
+
+        if (JoystickManager.get(index).button.justPressed())
+            shoot();
+    }
+
+    public void draw(SpriteBatch batch) {
         batch.draw(texture,
                    collisionCircle.x - width / 2,
                    collisionCircle.y - width / 2,
@@ -89,16 +113,12 @@ public class Tank extends GameObject {
                    width,
                    1.0f,
                    1.0f,
-                   Rotation,
+                   rotation,
                    0,
                    0,
                    texture.getWidth(),
                    texture.getHeight(),
                    false,
                    false);
-    }
-
-    public Circle getCollisionCircle() {
-        return collisionCircle;
     }
 }

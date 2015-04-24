@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.elvircrn.TankTrouble.MyGdxGame;
+import com.elvircrn.TankTrouble.TankTrouble;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override
@@ -15,6 +15,6 @@ public class AndroidLauncher extends AndroidApplication {
         config.useAccelerometer = false;
         config.useCompass = false;
 
-		initialize(new MyGdxGame(), config);
+		initialize(new TankTrouble(), config);
 	}
 }

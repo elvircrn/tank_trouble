@@ -3,45 +3,44 @@ package com.elvircrn.TankTrouble;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.ArrayList;
-
 /**
  * Created by elvircrn on 2/14/2015.
  */
 public class Input {
+    private static int touchCount;
+    public static Vector2[] touchList;
 
-    public static ArrayList<Vector2> TouchList;
-
-    public static void InitTouch() {
-        TouchList = new ArrayList<Vector2>();
+    public static void create() {
+        touchList = new Vector2[7];
+        for (int i = 0; i < 7; i++)
+            touchList[i] = new Vector2();
+        touchCount = 0;
     }
 
-    public static void InitJoystick() {
-        MyGdxGame.joystickOne = new Joystick(1);
-        MyGdxGame.joystickTwo = new Joystick(2);
+    public static int count() {
+        return touchCount;
     }
 
-    public static void Update() {
-        TouchList.clear();
+    public static void update() {
+        touchCount = 0;
 
         for (int i = 0; i < 7; i++) {
             if (Gdx.input.isTouched(i)) {
                 float locX = (float)Gdx.input.getX(i);
                 float locY = (float)Gdx.input.getY(i);
 
-                locY = MyGdxGame.h - locY;
+                locY = TankTrouble.h - locY;
 
-                locX = (locX / MyGdxGame.w) * MyGdxGame.PrefferedWidth;
-                locY = (locY / MyGdxGame.h) * MyGdxGame.PrefferedHeight;
-                TouchList.add(new Vector2((float)Math.floor ((double)locX), (float)Math.floor((double)locY)));
+                locX = (locX / TankTrouble.w) * TankTrouble.PrefferedWidth;
+                locY = (locY / TankTrouble.h) * TankTrouble.PrefferedHeight;
+
+                touchList[touchCount].set((float) Math.floor((double) locX), (float) Math.floor((double) locY));
+                touchCount++;
             }
         }
     }
 
-    public static void Debug() {
-        if (MyGdxGame.joystickOne.justPressed())
-            Gdx.app.log("joystickOne:", "just pressed");
-        else if (MyGdxGame.joystickTwo.justPressed())
-            Gdx.app.log("joystickTwo:", "just pressed");
+    public static Vector2 get(int index) {
+        return touchList[index];
     }
 }

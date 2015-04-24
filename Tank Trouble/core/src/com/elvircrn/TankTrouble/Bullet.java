@@ -1,120 +1,146 @@
 package com.elvircrn.TankTrouble;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Pool.Poolable;
 
 /**
  * Created by elvircrn on 2/14/2015.
  */
-public class Bullet {
-
+public class Bullet implements Poolable {
+    //static properties
     public static Texture texture;
+    public static int width, height; //initialized from the manager
+    public static float bulletDuration = 8.0f;
+    public static float bulletSpeed = 150.0f;
 
-    public short Source;
-
-    public static final float bulletExpiration = 8.0f;
-    public static final float defaultMeasure = 8.0f;
-
-    public static int bulletWidth;
-
-    public float expiration;
-
-    public Vector2 worldLocation;
-    public Vector2 direction;
-
-    public static float bulletSpeed = 170.0f;
-    public Vector2 ForceAccum, Direction;
-
-    public Rectangle worldRectangle;
-
-    public int notHit;
-
-    public Bullet(Vector2 location, Vector2 direction) {
-        worldLocation = new Vector2 (location.x, location.y);
-        this.direction = new Vector2 (direction.x, direction.y);
-        expiration = bulletExpiration;
-        notHit = 0;
-        worldRectangle = new Rectangle();
+    //static methods
+    public static void init(int bulletWidth, int bulletHeight) {
+        width = bulletWidth;
+        height = bulletHeight;
     }
 
-    public Rectangle getWorldRectangle() {
-        return worldRectangle;
+    public static void setTexture(Texture texture) {
+        Bullet.texture = texture;
     }
 
-    public static void initScale(float scale) {
-        bulletWidth = (int)(scale * defaultMeasure);
+    //instance properties
+    public Vector2 worldLocation, direction;
+    public boolean alive;
+    public float tick;
+    private Circle collisionCircle;
 
-        if (bulletWidth % 2 == 1)
-            bulletWidth++;
+    //constructors
+    public Bullet() {
+        worldLocation = new Vector2();
+        direction = new Vector2();
+        alive = false;
+        collisionCircle = new Circle();
+        tick = bulletDuration;
     }
 
-    public  boolean Update(float deltaTime) {
-
-        expiration -= deltaTime;
-
-        if (expiration < 0.0f)
-            return false;
-
-        float scaledSpeed = bulletSpeed * deltaTime;
-
-        //VERTICAL
-
-        worldLocation.add(direction.x * scaledSpeed, 0);
-
-        int newDirection = getNewDirection();
-
-        if (newDirection != -1) {
-            worldLocation.sub(direction.x * scaledSpeed, 0);
-            direction.x *= -1;
-            worldLocation.add(direction.x * scaledSpeed, direction.y * scaledSpeed);
-            worldRectangle.set(worldLocation.x - bulletWidth / 2, worldLocation.y - bulletWidth / 2, bulletWidth, bulletWidth);
-            return true;
-        }
-
-        //HORZIONTAL
-
-        worldLocation.sub(direction.x, 0);
-        worldLocation.add(0, direction.y * scaledSpeed);
-
-        worldRectangle.set(worldLocation.x - bulletWidth / 2, worldLocation.y - bulletWidth / 2, bulletWidth, bulletWidth);
-
-        newDirection = getNewDirection();
-
-        if (newDirection != -1) {
-            worldLocation.sub(0, direction.y * scaledSpeed);
-            direction.y *= -1;
-            worldLocation.add(direction.x * scaledSpeed, direction.y * scaledSpeed);
-        }
-
-        Circle oneCollision = MyGdxGame.tankOne.getCollisionCircle();
-        Circle twoCollision = MyGdxGame.tankTwo.getCollisionCircle();
-
-        worldRectangle.set(worldLocation.x - bulletWidth / 2, worldLocation.y - bulletWidth / 2, bulletWidth, bulletWidth);
-
-        if (Intersector.overlaps(oneCollision, getWorldRectangle())) {
-            MyGdxGame.tankOne.dead = true;
-            MyGdxGame.tankTwo.points++;
-        }
-
-        if (Intersector.overlaps(twoCollision, getWorldRectangle())) {
-            MyGdxGame.tankTwo.dead = true;
-            MyGdxGame.tankOne.points++;
-        }
-
-        return true;
+    public Bullet(Vector2 worldLocation, Vector2 direction) {
+        this.worldLocation = worldLocation;
+        this.direction = direction;
+        alive = true;
+        tick = bulletDuration;
     }
 
-    protected int getNewDirection() {
-        for (int i = 0; i < Level.walls.size(); i++) {
-            if (Intersector.overlaps(Level.walls.get(i).getCollisionRectangle(), worldRectangle)) {
-                return Level.walls.get(i).wallType;
+    //instance methods
+    public Circle getCollisionCircle() {
+        collisionCircle.set(worldLocation.x, worldLocation.y, width / 2);
+        return collisionCircle;
+    }
+
+    @Override
+    public void reset() {
+        alive = false;
+    }
+
+    public void init(float x, float y, float dirX, float dirY) {
+        worldLocation.set(x, y);
+        direction.set(dirX, dirY);
+        alive = true;
+        tick = bulletDuration;
+    }
+
+    public void update(float deltaTime) {
+        tick -= deltaTime;
+
+        if (tick < 0.0f) {
+            alive = false;
+            return;
+        }
+
+        int x, y;
+        float scaledSpeed = deltaTime * bulletSpeed, keepX = worldLocation.x, keepY = worldLocation.y;
+        boolean intersectX = false, intersectY = false;
+
+        /*for (int i = 0; i < 4; i++) {
+            x = Level.approxX(worldLocation.x + direction.x * scaledSpeed);
+            y = Level.approxY(worldLocation.y);
+
+            worldLocation.x += (direction.x * scaledSpeed);
+
+            if (Intersector.overlaps(getCollisionCircle(), Level.getWallRectangle(x * (Level.wallWidth + Level.getTileDimens()), y * (Level.wallWidth + Level.getTileDimens()), i))) {
+                intersectX = true;
             }
+
+            worldLocation.set(x - direction.x * scaledSpeed, y);
+
+            x = Level.approxX(worldLocation.x);
+            y = Level.approxY(worldLocation.y + direction.x * scaledSpeed);
+
+            worldLocation.y += direction.y * scaledSpeed;
+
+            if (Intersector.overlaps(getCollisionCircle(), Level.getWallRectangle(x * (Level.wallWidth + Level.getTileDimens()), y * (Level.wallWidth + Level.getTileDimens()), i))) {
+                intersectY = true;
+            }
+
+            worldLocation.set(x, y - direction.y * scaledSpeed);
+
+            if (intersectX && intersectY)
+                break;
         }
 
-        return -1;
+        if (intersectX)
+            direction.x *= -1;
+        if (intersectY)
+            direction.y *= -1;
+
+        worldLocation.set(keepX + direction.x * scaledSpeed, keepY + direction.y * scaledSpeed);*/
+
+        for (Wall wall : Level.walls) {
+            worldLocation.x += (direction.x * scaledSpeed);
+
+            if (Intersector.overlaps(getCollisionCircle(), wall.getCollisionRectangle()))
+                intersectX = true;
+
+            worldLocation.x -= (direction.x * scaledSpeed);
+            worldLocation.y += (direction.y * scaledSpeed);
+
+            if (Intersector.overlaps(getCollisionCircle(), wall.getCollisionRectangle()))
+                intersectY = true;
+
+            worldLocation.y -= (direction.y * scaledSpeed);
+
+            if (intersectX && intersectY)
+                break;
+        }
+
+        if (intersectX)
+            direction.x *= -1;
+        if (intersectY)
+            direction.y *= -1;
+
+        worldLocation.add(direction.x * scaledSpeed, direction.y * scaledSpeed);
+    }
+
+    public void draw(SpriteBatch batch) {
+        batch.draw(texture, worldLocation.x - (width / 2), worldLocation.y - (height / 2), (float)width, (float)height);
     }
 }
 

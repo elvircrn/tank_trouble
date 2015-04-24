@@ -19,6 +19,8 @@ public class Level {
     public static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
     public static int wallWidth = 8;
 
+    private static Rectangle ret;
+
     public static Texture tileTexture, wallTexture;
 
     public static Vector2 offset;
@@ -35,6 +37,14 @@ public class Level {
     public static Tile[][] Tiles;
 
     private Level() { }
+
+    public static void create() {
+        Tiles = new Tile[10][10];
+        visited = new Boolean[10] [10];
+        priority = new int[10] [10];
+        walls = new ArrayList();
+        ret = new Rectangle();
+    }
 
     public static void set_priorities(int width, int height) {
         for (int i = 0; i < width; i++)
@@ -73,19 +83,14 @@ public class Level {
     }
 
     public static void generateLevel(int widthParam, int heightParam) {
-        walls = new ArrayList<Wall>();
+        walls.clear();
         width = widthParam;
         height = heightParam;
 
-        Tiles = new Tile[width + 5][height + 5];
+        offset = new Vector2(TankTrouble.PrefferedWidth / 2 - getMapPixelWidth() / 2, 0);
 
-        visited = new Boolean[width + 5] [height + 5];
-        priority = new int[width + 5] [height + 5];
-
-        offset = new Vector2(MyGdxGame.PrefferedWidth / 2 - getMapPixelWidth() / 2, 0);
-
-        for (int i = 0; i < width + 5; i++)
-            for (int j = 0; j < height + 5; j++) {
+        for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++) {
                 visited[i][j] = false;
                 priority[i] [j] = 0;
                 Tiles[i] [j] = new Tile(15);
@@ -126,7 +131,7 @@ public class Level {
 
 
     public static int getTileDimens() {
-        return (int)((MyGdxGame.PrefferedHeight - wallWidth) / height) - wallWidth;
+        return (int)((TankTrouble.PrefferedHeight - wallWidth) / height) - wallWidth;
     }
 
     public static int getMapPixelWidth() {
@@ -209,10 +214,10 @@ public class Level {
         }
 
         Gdx.app.log("top wall: ", "offset.x: " + Integer.toString((int)offset.x) +
-                                  "MyGdxGame.PrefferedHeight: " + Integer.toString((int)MyGdxGame.PrefferedHeight) +
+                                  "MyGdxGame.PrefferedHeight: " + Integer.toString((int) TankTrouble.PrefferedHeight) +
                                   "getMapPixelWidth(): " + Integer.toString(getMapPixelWidth()));
 
-        newWalls.add(new Wall((int)offset.x, (int)MyGdxGame.PrefferedHeight - wallWidth, getMapPixelWidth(), wallWidth, HORIZONTAL));
+        newWalls.add(new Wall((int)offset.x, (int) TankTrouble.PrefferedHeight - wallWidth, getMapPixelWidth(), wallWidth, HORIZONTAL));
         newWalls.add(new Wall((int)offset.x + getMapPixelWidth() - wallWidth, 0, wallWidth, getMapPixelHeight(), VERTICAL));
         newWalls.add(new Wall((int)offset.x, 0, getMapPixelWidth(), wallWidth, HORIZONTAL));
 
@@ -222,22 +227,24 @@ public class Level {
     }
 
     public static Rectangle getWallRectangle(int x, int y, int direction) {
+        x *= (getTileDimens() + wallWidth);
+        y *= (getTileDimens() + wallWidth);
         if (direction == 0) {
-            return new Rectangle(x - wallWidth, y + getTileDimens(), getTileDimens() + wallWidth, wallWidth);
+            ret.set(x - wallWidth, y + getTileDimens(), getTileDimens() + wallWidth, wallWidth);
         }
         else if (direction == 1) {
-            return new Rectangle(x + getTileDimens(), y - wallWidth, wallWidth, getTileDimens() + wallWidth);
+            ret.set(x + getTileDimens(), y - wallWidth, wallWidth, getTileDimens() + wallWidth);
         }
         else if (direction == 2) {
-            return new Rectangle(x - wallWidth, y - wallWidth, getTileDimens() + wallWidth, wallWidth);
+            ret.set(x - wallWidth, y - wallWidth, getTileDimens() + wallWidth, wallWidth);
         }
         else {
-            return new Rectangle(x - wallWidth, y - wallWidth, wallWidth, getTileDimens() + wallWidth);
+            ret.set(x - wallWidth, y - wallWidth, wallWidth, getTileDimens() + wallWidth);
         }
+        return ret;
     }
 
     public static void drawWall(SpriteBatch batch, int x, int y, int direction) {
-
         if (direction == 0) {
             batch.draw(wallTexture, x - wallWidth, y + getTileDimens(), getTileDimens() + wallWidth, wallWidth);
         }
@@ -250,6 +257,14 @@ public class Level {
         else if (direction == 3) {
             batch.draw(wallTexture, x - wallWidth, y - wallWidth, wallWidth, getTileDimens() + wallWidth);
         }
+    }
+
+    public static int approxX(float x) {
+        return (int)((x - offset.x) / (getTileDimens() + wallWidth));
+    }
+
+    public static int approxY(float y) {
+        return (int)((y - offset.y) / (getTileDimens() + wallWidth));
     }
 
     public static void Debug(String logTag) {

@@ -20,17 +20,17 @@ public class PointsUI {
     public static void draw(SpriteBatch batch) {
         location = new Vector2(padding, padding);
 
-        for (int i = 0; i < MyGdxGame.tankOne.points; i++) {
-            batch.draw(MyGdxGame.tankOne.texture, location.x, location.y, width, height);
+        /*for (int i = 0; i < TankTrouble.tankOne.points; i++) {
+            batch.draw(TankTrouble.tankOne.texture, location.x, location.y, width, height);
             location.y += height + padding;
         }
 
-        location.x = MyGdxGame.PrefferedWidth - (padding + width);
-        location.y = MyGdxGame.PrefferedHeight - (padding + height);
+        location.x = TankTrouble.PrefferedWidth - (padding + width);
+        location.y = TankTrouble.PrefferedHeight - (padding + height);
 
-        for (int i = 0; i < MyGdxGame.tankTwo.points; i++) {
-            batch.draw(MyGdxGame.tankTwo.texture, location.x, location.y, width, height);
+        for (int i = 0; i < TankTrouble.tankTwo.points; i++) {
+            batch.draw(TankTrouble.tankTwo.texture, location.x, location.y, width, height);
             location.y -= (height + padding);
-        }
+        }*/
     }
 }

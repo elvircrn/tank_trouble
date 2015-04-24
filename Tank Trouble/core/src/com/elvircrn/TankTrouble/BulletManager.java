@@ -1,45 +1,53 @@
 package com.elvircrn.TankTrouble;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-
-import java.util.ArrayList;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 
 /**
  * Created by elvircrn on 2/14/2015.
  */
 public class BulletManager {
 
-    public static ArrayList<Bullet> bullets = new ArrayList<Bullet>();
-    private static ArrayList<Integer> toRemove = new ArrayList<Integer>();
+    public static final Array<Bullet> bullets = new Array();
+    public static final Pool<Bullet> bulletPool = new Pool<Bullet>() {
+        @Override
+        protected Bullet newObject() {
+            return new Bullet();
+        }
+    };
 
-
-    public static void init() {
-        bullets.clear();
-        Bullet.initScale(LevelManager.scale);
+    public static void create(int width, int height) {
+        Bullet.width = width;
+        Bullet.height = height;
     }
 
-    public static void addBullet(Bullet bullet) {
-        if (bullets.size() > 6)
-            return;
+    public static void init() {
+
+    }
+
+    public static void addBullet(float x, float y, float dirX, float dirY) {
+        Bullet bullet = bulletPool.obtain();
+        bullet.init(x, y, dirX, dirY);
         bullets.add(bullet);
     }
 
-    public static void Update(float deltaTime) {
-        toRemove.clear();
-
-        for (int i = 0; i < bullets.size(); i++)
-            if (bullets.get(i).Update(deltaTime) == false)
-                toRemove.add(i);
-
-        for (int i : toRemove)
-            bullets.remove(i);
+    public static void update(float deltaTime) {
+        Bullet bullet;
+        int n = bullets.size;
+        for (int i = n - 1; i > -1; i--) {
+            bullet = bullets.get(i);
+            bullet.update(deltaTime);
+            if (!bullet.alive) {
+                bullets.removeIndex(i);
+                bulletPool.free(bullet);
+            }
+        }
     }
 
-    public static void Draw(SpriteBatch batch) {
+    public static void draw(SpriteBatch batch) {
         for (Bullet bullet : bullets) {
-            Rectangle drawRectangle = bullet.getWorldRectangle();
-            batch.draw(Bullet.texture, drawRectangle.x, drawRectangle.y, drawRectangle.width, drawRectangle.height);
+            bullet.draw(batch);
         }
     }
 }
