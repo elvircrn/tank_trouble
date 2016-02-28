@@ -1,17 +1,23 @@
 package com.elvircrn.TankTrouble;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 /**
  * Created by elvircrn on 2/14/2015.
  */
 public class Tank {
-    //static values
+    //public static values
     public static float tankSpeed = 100.0f;
     public Texture texture;
+
+    //private static values
+    public Rectangle collision;
 
     //static properties
     public void setTexture(Texture texture) {
@@ -31,7 +37,7 @@ public class Tank {
     protected Vector2 moveDirection;
     protected Circle collisionCircle;
 
-    public Tank() { moveDirection = new Vector2(); collisionCircle = new Circle(); worldLocation = new Vector2(); }
+    public Tank() { collision = new Rectangle(); moveDirection = new Vector2(); collisionCircle = new Circle(); worldLocation = new Vector2(); }
     public Tank(int index, Vector2 startLocation, float startRotation, float tankWidth, float tankHeight) {
         this();
         init(index, startLocation, startRotation, tankWidth, tankHeight);
@@ -75,7 +81,7 @@ public class Tank {
 
             boolean intersectX = false, intersectY = false;
 
-            /*for (Wall wall : Level.walls) {
+            for (Wall wall : Level.walls) {
                 worldLocation.x += (moveDirection.x * scaledSpeed);
 
                 if (Intersector.overlaps(getCollisionCircle(), wall.getCollisionRectangle()))
@@ -91,12 +97,42 @@ public class Tank {
 
                 if (intersectX && intersectY)
                     break;
-            }*/
+            }
 
             if (!intersectX)
                 worldLocation.x += moveDirection.x * scaledSpeed;
             if (!intersectY)
                 worldLocation.y += moveDirection.y * scaledSpeed;
+
+
+            /** new collision*/
+            /*int approxX = Level.approxX(worldLocation.x);
+            int approxY = Level.approxY(worldLocation.y);
+
+            for (int i = 0; i < 4; i++) {
+                Level.getWallRectangle(collision, approxX, approxY, i);
+
+                worldLocation.x += (moveDirection.x * scaledSpeed);
+
+                if (Intersector.overlaps(getCollisionCircle(), collision))
+                    intersectX = true;
+
+                worldLocation.x -= (moveDirection.x * scaledSpeed);
+                worldLocation.y += (moveDirection.y * scaledSpeed);
+
+                if (Intersector.overlaps(getCollisionCircle(), collision))
+                    intersectY = true;
+
+                worldLocation.y -= (moveDirection.y * scaledSpeed);
+
+                if (intersectX && intersectY)
+                    break;
+            }
+
+            if (!intersectX)
+                worldLocation.x += moveDirection.x * scaledSpeed;
+            if (!intersectY)
+                worldLocation.y += moveDirection.y * scaledSpeed;*/
         }
 
         if (JoystickManager.get(index).button.justPressed())
@@ -120,5 +156,12 @@ public class Tank {
                    texture.getHeight(),
                    false,
                    false);
+    }
+
+    public void debug() {
+        int approxX = Level.approxX(worldLocation.x);
+        int approxY = Level.approxY(worldLocation.y);
+
+        Gdx.app.log("approximated location: ", Integer.toString(approxX) + " " + Integer.toString(approxY));
     }
 }

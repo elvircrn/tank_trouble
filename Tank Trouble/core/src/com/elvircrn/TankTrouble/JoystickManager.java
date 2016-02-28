@@ -2,9 +2,6 @@ package com.elvircrn.TankTrouble;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-/**
- * Created by elvircrn on 3/5/2015.
- */
 public class JoystickManager {
     public static Joystick[] joysticks;
 

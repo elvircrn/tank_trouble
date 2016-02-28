@@ -11,11 +11,14 @@ import com.badlogic.gdx.utils.Pool.Poolable;
  * Created by elvircrn on 2/14/2015.
  */
 public class Bullet implements Poolable {
-    //static properties
+    //public static properties
     public static Texture texture;
     public static int width, height; //initialized from the manager
     public static float bulletDuration = 8.0f;
     public static float bulletSpeed = 150.0f;
+
+    //private static properties (e.g. physics helpers)
+    private Vector2 approximation;
 
     //static methods
     public static void init(int bulletWidth, int bulletHeight) {
@@ -113,6 +116,7 @@ public class Bullet implements Poolable {
 
         worldLocation.set(keepX + direction.x * scaledSpeed, keepY + direction.y * scaledSpeed);*/
 
+        /** old collision*/
         for (Wall wall : Level.walls) {
             worldLocation.x += (direction.x * scaledSpeed);
 
@@ -137,6 +141,9 @@ public class Bullet implements Poolable {
             direction.y *= -1;
 
         worldLocation.add(direction.x * scaledSpeed, direction.y * scaledSpeed);
+
+
+
     }
 
     public void draw(SpriteBatch batch) {

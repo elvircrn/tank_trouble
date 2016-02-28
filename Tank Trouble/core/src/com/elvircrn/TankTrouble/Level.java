@@ -42,7 +42,7 @@ public class Level {
         Tiles = new Tile[10][10];
         visited = new Boolean[10] [10];
         priority = new int[10] [10];
-        walls = new ArrayList();
+        walls = new ArrayList<Wall>();
         ret = new Rectangle();
     }
 
@@ -156,6 +156,8 @@ public class Level {
     public static void Draw(SpriteBatch batch) {
         for (Wall wall : walls) {
             batch.draw(wallTexture, wall.x, wall.y, wall.width, wall.height);
+
+
         }
     }
 
@@ -226,9 +228,10 @@ public class Level {
                 walls.add(wall);
     }
 
-    public static Rectangle getWallRectangle(int x, int y, int direction) {
+    public static void getWallRectangle(Rectangle rec, int x, int y, int direction) {
         x *= (getTileDimens() + wallWidth);
         y *= (getTileDimens() + wallWidth);
+
         if (direction == 0) {
             ret.set(x - wallWidth, y + getTileDimens(), getTileDimens() + wallWidth, wallWidth);
         }
@@ -241,7 +244,6 @@ public class Level {
         else {
             ret.set(x - wallWidth, y - wallWidth, wallWidth, getTileDimens() + wallWidth);
         }
-        return ret;
     }
 
     public static void drawWall(SpriteBatch batch, int x, int y, int direction) {
