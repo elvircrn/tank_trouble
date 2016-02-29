@@ -1,6 +1,5 @@
 package com.elvircrn.TankTrouble;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
@@ -30,7 +29,7 @@ public class Tank {
 
     //collision
     public Vector2 worldLocation;
-    public float collisionRadius;
+    protected float collisionRadius;
     public float width, height;
     public float rotation;
 
@@ -44,16 +43,25 @@ public class Tank {
         worldLocation = new Vector2();
     }
 
+    public Tank(int index, Vector2 startLocation, float startRotation, float tankWidth, float tankHeight) {
+        this();
+        init(index, startLocation, startRotation, tankWidth, tankHeight);
+    }
+
     public void init(int index, Vector2 startLocation, float startRotation, float tankWidth, float tankHeight) {
         this.index = index;
-        points = 0;
-        collisionCircle = new Circle();
-        worldLocation = new Vector2(startLocation.x, startLocation.y);
-        rotation = startRotation;
-        width = tankWidth;
-        height = tankHeight;
-        initCollisionCircle();
-        moveDirection.set(0, 1);
+        this.points = 0;
+        this.worldLocation.set(startLocation.x, startLocation.y);
+        this.rotation = startRotation;
+        this.width = tankWidth;
+        this.height = tankHeight;
+        this.initCollisionCircle();
+        this.moveDirection.set(0, 1);
+    }
+
+    public void spawnTo(Vector2 where, float defaultRotation) {
+        worldLocation = where;
+        rotation = defaultRotation;
     }
 
     private void initCollisionCircle() {
@@ -74,6 +82,8 @@ public class Tank {
     protected void moveTo(float deltaTime) {
         float scaledSpeed = tankSpeed * deltaTime;
         boolean intersectX = false, intersectY = false;
+
+        //Gdx.app.log("debug", "Tank " + Integer.toString(index) + " " + Float.toString(moveDirection.x) + " " + Float.toString(moveDirection.y));
 
         for (Wall wall : Level.walls) {
             worldLocation.x += (moveDirection.x * scaledSpeed);
@@ -101,7 +111,6 @@ public class Tank {
 
     public void update(float deltaTime) {
         if (JoystickManager.get(index).moving()) {
-            Gdx.app.log("analog", "moving " + Integer.toString(index));
             rotation = JoystickManager.get(index).analog.getNorAngle();
             moveDirection = new Vector2(JoystickManager.get(index).analog.getNorDirection());
             moveTo(deltaTime);

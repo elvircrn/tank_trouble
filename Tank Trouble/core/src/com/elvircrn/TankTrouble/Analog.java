@@ -85,7 +85,7 @@ public class Analog {
             analogLocation.set(center.x + calc.x, center.y + calc.y);
         }
 
-        norDirection.set (calc.nor().x, calc.nor().y);
+        norDirection.set(calc.nor().x, calc.nor().y);
     }
 
     public void reset() {

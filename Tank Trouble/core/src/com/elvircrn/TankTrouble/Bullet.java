@@ -17,6 +17,8 @@ public class Bullet implements Poolable {
     public static float bulletDuration = 8.0f;
     public static float bulletSpeed = 150.0f;
 
+    public int owner;
+
     //private static properties (e.g. physics helpers)
     private Vector2 approximation;
 
@@ -63,11 +65,12 @@ public class Bullet implements Poolable {
         alive = false;
     }
 
-    public void init(float x, float y, float dirX, float dirY) {
-        worldLocation.set(x, y);
-        direction.set(dirX, dirY);
-        alive = true;
-        tick = bulletDuration;
+    public void init(float x, float y, float dirX, float dirY, int owner) {
+        this.worldLocation.set(x, y);
+        this.direction.set(dirX, dirY);
+        this.alive = true;
+        this.tick = bulletDuration;
+        this.owner = owner;
     }
 
     public void update(float deltaTime) {

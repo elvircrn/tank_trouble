@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Pool;
  * Created by elvircrn on 2/14/2015.
  */
 public class BulletManager {
-
     public static final Array<Bullet> bullets = new Array();
     public static final Pool<Bullet> bulletPool = new Pool<Bullet>() {
         @Override
@@ -43,6 +42,19 @@ public class BulletManager {
                 bulletPool.free(bullet);
             }
         }
+    }
+
+    public static Bullet get(int index) {
+        return bullets.get(index);
+    }
+
+    public static int count() {
+        return bullets.size;
+    }
+
+    public static void clearBullets() {
+        for (int i = 0; i < bullets.size; i++)
+            bullets.get(i).alive = false;
     }
 
     public static void draw(SpriteBatch batch) {
