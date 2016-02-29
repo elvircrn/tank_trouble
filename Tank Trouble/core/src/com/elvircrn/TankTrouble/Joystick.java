@@ -4,11 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
-/**
- * Created by elvircrn on 2/14/2015.
- */
 public class Joystick {
-
     public int index;
 
     public Analog analog;
@@ -16,9 +12,8 @@ public class Joystick {
 
     public Rectangle inputRegion;
 
-    public Joystick() { analog = new Analog(); button = new Button(); }
-    public Joystick(int index, Analog analog, Button button) {
-        this.index = index;
+    public Joystick() { }
+    public Joystick(Analog analog, Button button) {
         this.analog = analog;
         this.button = button;
     }

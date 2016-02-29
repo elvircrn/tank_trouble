@@ -14,7 +14,6 @@ public class BlockManager {
 
     public static void create(int width, int height) {
         blocks = new Block[width] [height];
-
         init(width, height);
     }
 
@@ -27,8 +26,6 @@ public class BlockManager {
 
         paddingX = ((int)TankTrouble.PrefferedWidth - mapPixWidth) / 2;
         paddingY = ((int)TankTrouble.PrefferedHeight - mapPixHeight) / 2;
-
-
     }
 
     public static void draw(SpriteBatch batch) {

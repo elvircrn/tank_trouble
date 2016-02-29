@@ -25,10 +25,26 @@ public class Analog {
         calc = new Vector2();
     }
 
-    public Analog() { norDirection = new Vector2(); analogLocation = new Vector2(); screenRectangle = new Rectangle(); center = new Vector2(); }
-    public Analog(Vector2 screenLocation, float stickWidth, float stickHeight, float moveRadius) {
-        this();
-        init(screenLocation.x, screenLocation.y, stickWidth, stickHeight, moveRadius);
+    public Analog() {
+        norDirection = new Vector2();
+        analogLocation = new Vector2();
+        screenRectangle = new Rectangle();
+        center = new Vector2();
+    }
+    public Analog(float locX, float locY, float stickWidth, float stickHeight, float moveRadius) {
+        this.norAngle = 0;
+        this.prevAnalogMoved = false;
+        this.analogMoved = false;
+        this.stickWidth = stickWidth;
+        this.stickHeight = stickHeight;
+        this.moveRadius = moveRadius;
+        this.largeWidth = 2 * stickWidth;
+        this.largeHeight = 2 * stickHeight;
+
+        this.center = new Vector2(locX, locY);
+        this.analogLocation = new Vector2(locX, locY);
+        this.norDirection = new Vector2();
+        this.screenRectangle = new Rectangle();
     }
 
     public void init(float locX, float locY, float stickWidth, float stickHeight, float moveRadius) {
@@ -69,7 +85,7 @@ public class Analog {
             analogLocation.set(center.x + calc.x, center.y + calc.y);
         }
 
-        norDirection = calc.nor();
+        norDirection.set (calc.nor().x, calc.nor().y);
     }
 
     public void reset() {

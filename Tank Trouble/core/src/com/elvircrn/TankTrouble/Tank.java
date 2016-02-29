@@ -37,18 +37,18 @@ public class Tank {
     protected Vector2 moveDirection;
     protected Circle collisionCircle;
 
-    public Tank() { collision = new Rectangle(); moveDirection = new Vector2(); collisionCircle = new Circle(); worldLocation = new Vector2(); }
-    public Tank(int index, Vector2 startLocation, float startRotation, float tankWidth, float tankHeight) {
-        this();
-        init(index, startLocation, startRotation, tankWidth, tankHeight);
+    public Tank() {
+        collision = new Rectangle();
+        moveDirection = new Vector2();
+        collisionCircle = new Circle();
+        worldLocation = new Vector2();
     }
 
     public void init(int index, Vector2 startLocation, float startRotation, float tankWidth, float tankHeight) {
         this.index = index;
         points = 0;
         collisionCircle = new Circle();
-        worldLocation = new Vector2();
-        worldLocation = startLocation;
+        worldLocation = new Vector2(startLocation.x, startLocation.y);
         rotation = startRotation;
         width = tankWidth;
         height = tankHeight;
@@ -71,70 +71,41 @@ public class Tank {
         BulletManager.addBullet(worldLocation.x + moveDirection.x * r, worldLocation.y + moveDirection.y * r, moveDirection.x, moveDirection.y);
     }
 
-    public void update(float deltaTime) {
-        if (JoystickManager.get(index).moving()) {
-            rotation = JoystickManager.get(index).analog.getNorAngle();
+    protected void moveTo(float deltaTime) {
+        float scaledSpeed = tankSpeed * deltaTime;
+        boolean intersectX = false, intersectY = false;
 
-            float scaledSpeed = tankSpeed * deltaTime;
+        for (Wall wall : Level.walls) {
+            worldLocation.x += (moveDirection.x * scaledSpeed);
 
-            moveDirection.set(JoystickManager.get(index).analog.getNorDirection());
+            if (Intersector.overlaps(getCollisionCircle(), wall.getCollisionRectangle()))
+                intersectX = true;
 
-            boolean intersectX = false, intersectY = false;
+            worldLocation.x -= (moveDirection.x * scaledSpeed);
+            worldLocation.y += (moveDirection.y * scaledSpeed);
 
-            for (Wall wall : Level.walls) {
-                worldLocation.x += (moveDirection.x * scaledSpeed);
+            if (Intersector.overlaps(getCollisionCircle(), wall.getCollisionRectangle()))
+                intersectY = true;
 
-                if (Intersector.overlaps(getCollisionCircle(), wall.getCollisionRectangle()))
-                    intersectX = true;
+            worldLocation.y -= (moveDirection.y * scaledSpeed);
 
-                worldLocation.x -= (moveDirection.x * scaledSpeed);
-                worldLocation.y += (moveDirection.y * scaledSpeed);
-
-                if (Intersector.overlaps(getCollisionCircle(), wall.getCollisionRectangle()))
-                    intersectY = true;
-
-                worldLocation.y -= (moveDirection.y * scaledSpeed);
-
-                if (intersectX && intersectY)
-                    break;
-            }
-
-            if (!intersectX)
-                worldLocation.x += moveDirection.x * scaledSpeed;
-            if (!intersectY)
-                worldLocation.y += moveDirection.y * scaledSpeed;
-
-
-            /** new collision*/
-            /*int approxX = Level.approxX(worldLocation.x);
-            int approxY = Level.approxY(worldLocation.y);
-
-            for (int i = 0; i < 4; i++) {
-                Level.getWallRectangle(collision, approxX, approxY, i);
-
-                worldLocation.x += (moveDirection.x * scaledSpeed);
-
-                if (Intersector.overlaps(getCollisionCircle(), collision))
-                    intersectX = true;
-
-                worldLocation.x -= (moveDirection.x * scaledSpeed);
-                worldLocation.y += (moveDirection.y * scaledSpeed);
-
-                if (Intersector.overlaps(getCollisionCircle(), collision))
-                    intersectY = true;
-
-                worldLocation.y -= (moveDirection.y * scaledSpeed);
-
-                if (intersectX && intersectY)
-                    break;
-            }
-
-            if (!intersectX)
-                worldLocation.x += moveDirection.x * scaledSpeed;
-            if (!intersectY)
-                worldLocation.y += moveDirection.y * scaledSpeed;*/
+            if (intersectX && intersectY)
+                break;
         }
 
+        if (!intersectX)
+            worldLocation.x += moveDirection.x * scaledSpeed;
+        if (!intersectY)
+            worldLocation.y += moveDirection.y * scaledSpeed;
+    }
+
+    public void update(float deltaTime) {
+        if (JoystickManager.get(index).moving()) {
+            Gdx.app.log("analog", "moving " + Integer.toString(index));
+            rotation = JoystickManager.get(index).analog.getNorAngle();
+            moveDirection = new Vector2(JoystickManager.get(index).analog.getNorDirection());
+            moveTo(deltaTime);
+        }
         if (JoystickManager.get(index).button.justPressed())
             shoot();
     }
@@ -161,7 +132,5 @@ public class Tank {
     public void debug() {
         int approxX = Level.approxX(worldLocation.x);
         int approxY = Level.approxY(worldLocation.y);
-
-        Gdx.app.log("approximated location: ", Integer.toString(approxX) + " " + Integer.toString(approxY));
     }
 }

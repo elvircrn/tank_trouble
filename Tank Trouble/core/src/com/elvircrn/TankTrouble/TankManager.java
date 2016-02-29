@@ -30,6 +30,7 @@ public class TankManager {
     }
 
     public static void update(float deltaTime) {
+        //for (int i = 0; i < 1; i++)
         for (int i = 0; i < GameMaster.playerCount; i++)
             tanks[i].update(deltaTime);
     }

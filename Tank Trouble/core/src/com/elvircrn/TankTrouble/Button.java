@@ -23,10 +23,19 @@ public class Button {
     public boolean prevButtonPressed, buttonPressed;
 
     //constructors
-    public Button() { screenLocation = new Vector2(); screenRectangle = new Rectangle(); }
-    public Button(int index, Vector2 worldLocation, float width, float height) {
-        this();
-        init(index, worldLocation.x, worldLocation.y, width, height);
+    public Button() {
+        screenLocation = new Vector2();
+        screenRectangle = new Rectangle();
+    }
+
+    public Button(int index, float locX, float locY, float width, float height) {
+        screenRectangle = new Rectangle();
+        this.index = index;
+        screenLocation = new Vector2(locX, locY);
+        this.width = width;
+        this.height = height;
+        buttonPressed = false;
+        prevButtonPressed = false;
     }
 
     //instance methods

@@ -49,29 +49,40 @@ public class GameMaster {
         Vector2 tankTwo = Level.tileToScreen(Level.width - 1, Level.height - 1);
 
         float tankDimens = (2.0f * Level.getTileDimens()) / 5.0f;
-
+/*
         tankOne.set(tankOne.x + Level.getTileDimens() / 2, tankOne.y + Level.getTileDimens() / 2);
         tankTwo.set(tankTwo.x + Level.getTileDimens() / 2, tankTwo.y + Level.getTileDimens() / 2);
-
-        TankManager.get(0).init(0, tankOne, JoystickManager.get(0).analog.getNorAngle(), tankDimens, tankDimens);
-        TankManager.get(1).init(1, tankTwo, JoystickManager.get(1).analog.getNorAngle(), tankDimens, tankDimens);
+*/
+        TankManager.get(0).init(0, new Vector2(tankOne.x + Level.getTileDimens() / 2, tankOne.y + Level.getTileDimens() / 2), JoystickManager.get(0).analog.getNorAngle(), tankDimens, tankDimens);
+        TankManager.get(1).init(1, new Vector2(tankTwo.x + Level.getTileDimens() / 2, tankTwo.y + Level.getTileDimens() / 2), JoystickManager.get(1).analog.getNorAngle(), tankDimens, tankDimens);
     }
 
     private static void initJoysticks() {
         LevelManager.initLevel();
-        JoystickManager.get(0).button.init(0,
+
+        JoystickManager.get(0).button = new Button(0,
                 0.18f * TankTrouble.PrefferedWidth,
                 0.18f * TankTrouble.PrefferedHeight,
                 0.10f * TankTrouble.PrefferedWidth,
                 0.10f * TankTrouble.PrefferedWidth);
-        JoystickManager.get(1).button.init(1,
+
+        JoystickManager.get(1).button = new Button(1,
                 0.82f * TankTrouble.PrefferedWidth,
                 0.82f * TankTrouble.PrefferedHeight,
                 0.10f * TankTrouble.PrefferedWidth,
                 0.10f * TankTrouble.PrefferedWidth);
 
-        JoystickManager.get(0).analog.init(0.18f * TankTrouble.PrefferedWidth, 0.82f * TankTrouble.PrefferedHeight, 0.10f * TankTrouble.PrefferedWidth, 0.10f * TankTrouble.PrefferedWidth, 0.05f * TankTrouble.PrefferedWidth);
-        JoystickManager.get(1).analog.init(0.82f * TankTrouble.PrefferedWidth, 0.18f * TankTrouble.PrefferedHeight, 0.10f * TankTrouble.PrefferedWidth, 0.10f * TankTrouble.PrefferedWidth, 0.05f * TankTrouble.PrefferedWidth);
+        JoystickManager.get(0).analog = new Analog(0.18f * TankTrouble.PrefferedWidth,
+                                                   0.82f * TankTrouble.PrefferedHeight,
+                                                   0.10f * TankTrouble.PrefferedWidth,
+                                                   0.10f * TankTrouble.PrefferedWidth,
+                                                   0.05f * TankTrouble.PrefferedWidth);
+
+        JoystickManager.get(1).analog = new Analog(0.82f * TankTrouble.PrefferedWidth,
+                                                   0.18f * TankTrouble.PrefferedHeight,
+                                                   0.10f * TankTrouble.PrefferedWidth,
+                                                   0.10f * TankTrouble.PrefferedWidth,
+                                                   0.05f * TankTrouble.PrefferedWidth);
 
         JoystickManager.get(0).setInputRegion(new Rectangle(0, 0, TankTrouble.PrefferedWidth / 2, TankTrouble.PrefferedHeight));
         JoystickManager.get(1).setInputRegion(new Rectangle(TankTrouble.PrefferedWidth / 2, 0, TankTrouble.PrefferedWidth / 2, TankTrouble.PrefferedHeight));
