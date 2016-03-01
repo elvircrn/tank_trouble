@@ -1,5 +1,6 @@
 package com.elvircrn.TankTrouble;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -102,6 +103,8 @@ public class GameMaster {
         for (int i = 0; i < BulletManager.count(); i++) {
             for (int j = 0; j < playerCount; j++) {
                 if (TankManager.get(j).getCollisionCircle().contains(BulletManager.get(i).getCollisionCircle())) {
+                    TankManager.get((j + 1) % 2).points++;
+                    Gdx.app.log("points", "one: " + Integer.toString(TankManager.get(0).points) + " two: " + Integer.toString(TankManager.get(1).points));
                     initNewRound();
                 }
             }
@@ -115,7 +118,7 @@ public class GameMaster {
         Vector2 tankTwo = Level.tileToScreen(Level.width - 1, Level.height - 1);
 
         float tankDimens = (2.0f * Level.getTileDimens()) / 5.0f;
-        TankManager.get(0).init(0, new Vector2(tankOne.x + Level.getTileDimens() / 2, tankOne.y + Level.getTileDimens() / 2), JoystickManager.get(0).analog.getNorAngle(), tankDimens, tankDimens);
-        TankManager.get(1).init(1, new Vector2(tankTwo.x + Level.getTileDimens() / 2, tankTwo.y + Level.getTileDimens() / 2), JoystickManager.get(1).analog.getNorAngle(), tankDimens, tankDimens);
+        TankManager.get(0).spawnTo(tankOne.x + Level.getTileDimens() / 2, tankOne.y + Level.getTileDimens() / 2, JoystickManager.get(0).analog.getNorAngle(), tankDimens, tankDimens);
+        TankManager.get(1).spawnTo(tankTwo.x + Level.getTileDimens() / 2, tankTwo.y + Level.getTileDimens() / 2, JoystickManager.get(1).analog.getNorAngle(), tankDimens, tankDimens);
     }
 }

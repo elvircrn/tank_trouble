@@ -11,31 +11,37 @@ import com.badlogic.gdx.math.Vector2;
  * Created by elvircrn on 2/14/2015.
  */
 public class Tank {
-    //public static values
+    //static properties
     public static float tankSpeed = 100.0f;
+    public static int defaultMaxAmmo = 3;
+    public static float defaultReloadTime = 2.0f;
+
+    //Textures
     public Texture texture;
 
-    //private static values
-    public Rectangle collision;
-
-    //static properties
-    public void setTexture(Texture texture) {
-        this.texture = texture;
-    }
-
-    //instance values
+    //Fun tank stuff
     public int index;
     public int points;
 
-    //collision
+    //Ammo
+    public int currentAmmo;
+    public int maxAmmo;
+    public float reloadTime;
+    public float reloadTick;
+
+    //Physical properties
     public Vector2 worldLocation;
     protected float collisionRadius;
     public float width, height;
     public float rotation;
-
+    public Rectangle collision;
     protected Vector2 moveDirection;
     protected Circle collisionCircle;
 
+    //Boring flags
+    public boolean drawable;
+
+    //Constructors
     public Tank() {
         collision = new Rectangle();
         moveDirection = new Vector2();
@@ -50,18 +56,39 @@ public class Tank {
 
     public void init(int index, Vector2 startLocation, float startRotation, float tankWidth, float tankHeight) {
         this.index = index;
-        this.points = 0;
         this.worldLocation.set(startLocation.x, startLocation.y);
         this.rotation = startRotation;
         this.width = tankWidth;
         this.height = tankHeight;
         this.initCollisionCircle();
         this.moveDirection.set(0, 1);
+
+        this.reloadTime = Tank.defaultReloadTime;
+        this.currentAmmo = Tank.defaultMaxAmmo;
+        this.reloadTick = Tank.defaultReloadTime;
+        this.maxAmmo = Tank.defaultMaxAmmo;
+
+        this.drawable = true;
     }
 
-    public void spawnTo(Vector2 where, float defaultRotation) {
-        worldLocation = where;
-        rotation = defaultRotation;
+    public void setTexture(Texture texture) {
+        this.texture = texture;
+    }
+
+    public void spawnTo(float startLocationX, float startLocationY, float startRotation, float tankWidth, float tankHeight) {
+        this.worldLocation.set(startLocationX, startLocationY);
+        this.rotation = startRotation;
+        this.width = tankWidth;
+        this.height = tankHeight;
+        this.initCollisionCircle();
+        this.moveDirection.set(0, 1);
+
+        this.reloadTime = Tank.defaultReloadTime;
+        this.currentAmmo = Tank.defaultMaxAmmo;
+        this.reloadTick = Tank.defaultReloadTime;
+        this.maxAmmo = Tank.defaultMaxAmmo;
+
+        this.drawable = true;
     }
 
     private void initCollisionCircle() {
@@ -75,15 +102,16 @@ public class Tank {
     }
 
     public void shoot() {
-        float r = getCollisionCircle().radius + 5;
-        BulletManager.addBullet(worldLocation.x + moveDirection.x * r, worldLocation.y + moveDirection.y * r, moveDirection.x, moveDirection.y);
+        if (this.currentAmmo > 0) {
+            float r = getCollisionCircle().radius + 5;
+            BulletManager.addBullet(worldLocation.x + moveDirection.x * r, worldLocation.y + moveDirection.y * r, moveDirection.x, moveDirection.y, index);
+            this.currentAmmo--;
+        }
     }
 
     protected void moveTo(float deltaTime) {
         float scaledSpeed = tankSpeed * deltaTime;
         boolean intersectX = false, intersectY = false;
-
-        //Gdx.app.log("debug", "Tank " + Integer.toString(index) + " " + Float.toString(moveDirection.x) + " " + Float.toString(moveDirection.y));
 
         for (Wall wall : Level.walls) {
             worldLocation.x += (moveDirection.x * scaledSpeed);
@@ -110,16 +138,30 @@ public class Tank {
     }
 
     public void update(float deltaTime) {
+        if (currentAmmo == 0) {
+            reloadTick -= deltaTime;
+        }
+
+        if (currentAmmo == 0 && reloadTick < 0) {
+            reloadTick = reloadTime;
+            currentAmmo = maxAmmo;
+        }
+
         if (JoystickManager.get(index).moving()) {
             rotation = JoystickManager.get(index).analog.getNorAngle();
             moveDirection = new Vector2(JoystickManager.get(index).analog.getNorDirection());
             moveTo(deltaTime);
         }
-        if (JoystickManager.get(index).button.justPressed())
+
+        if (JoystickManager.get(index).button.justPressed()) {
             shoot();
+        }
     }
 
     public void draw(SpriteBatch batch) {
+        if (!drawable)
+            return;
+        
         batch.draw(texture,
                    collisionCircle.x - width / 2,
                    collisionCircle.y - width / 2,
@@ -136,10 +178,5 @@ public class Tank {
                    texture.getHeight(),
                    false,
                    false);
-    }
-
-    public void debug() {
-        int approxX = Level.approxX(worldLocation.x);
-        int approxY = Level.approxY(worldLocation.y);
     }
 }

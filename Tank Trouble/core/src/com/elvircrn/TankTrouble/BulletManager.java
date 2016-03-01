@@ -25,9 +25,9 @@ public class BulletManager {
 
     }
 
-    public static void addBullet(float x, float y, float dirX, float dirY) {
+    public static void addBullet(float x, float y, float dirX, float dirY, int owner) {
         Bullet bullet = bulletPool.obtain();
-        bullet.init(x, y, dirX, dirY);
+        bullet.init(x, y, dirX, dirY, owner);
         bullets.add(bullet);
     }
 

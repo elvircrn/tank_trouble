@@ -85,40 +85,6 @@ public class Bullet implements Poolable {
         float scaledSpeed = deltaTime * bulletSpeed, keepX = worldLocation.x, keepY = worldLocation.y;
         boolean intersectX = false, intersectY = false;
 
-        /*for (int i = 0; i < 4; i++) {
-            x = Level.approxX(worldLocation.x + direction.x * scaledSpeed);
-            y = Level.approxY(worldLocation.y);
-
-            worldLocation.x += (direction.x * scaledSpeed);
-
-            if (Intersector.overlaps(getCollisionCircle(), Level.getWallRectangle(x * (Level.wallWidth + Level.getTileDimens()), y * (Level.wallWidth + Level.getTileDimens()), i))) {
-                intersectX = true;
-            }
-
-            worldLocation.set(x - direction.x * scaledSpeed, y);
-
-            x = Level.approxX(worldLocation.x);
-            y = Level.approxY(worldLocation.y + direction.x * scaledSpeed);
-
-            worldLocation.y += direction.y * scaledSpeed;
-
-            if (Intersector.overlaps(getCollisionCircle(), Level.getWallRectangle(x * (Level.wallWidth + Level.getTileDimens()), y * (Level.wallWidth + Level.getTileDimens()), i))) {
-                intersectY = true;
-            }
-
-            worldLocation.set(x, y - direction.y * scaledSpeed);
-
-            if (intersectX && intersectY)
-                break;
-        }
-
-        if (intersectX)
-            direction.x *= -1;
-        if (intersectY)
-            direction.y *= -1;
-
-        worldLocation.set(keepX + direction.x * scaledSpeed, keepY + direction.y * scaledSpeed);*/
-
         /** old collision*/
         for (Wall wall : Level.walls) {
             worldLocation.x += (direction.x * scaledSpeed);
@@ -144,9 +110,6 @@ public class Bullet implements Poolable {
             direction.y *= -1;
 
         worldLocation.add(direction.x * scaledSpeed, direction.y * scaledSpeed);
-
-
-
     }
 
     public void draw(SpriteBatch batch) {
