@@ -51,14 +51,19 @@ public class BTManager {
     }
 
     public static void sendData(byte[] data) throws IOException {
+        String string = new String(data);
+        Log.d("sending: ", string);
         handshake.sendData(data);
     }
 
     public static void receiveData(int bytes, byte[] data) throws IOException {
         String string = new String(data);
 
+        Log.d("received: ", string);
+
         if (string.charAt(0) == CodeManager.NewGameResponse) {
-            int seed = Integer.parseInt(string.substring(1));
+            int seed;
+            seed = Integer.parseInt(string.substring(1));
             GameMaster.initNewRound(seed);
         }
         else if (string.charAt(0) == CodeManager.RequestNewGame) {
