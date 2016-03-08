@@ -12,10 +12,12 @@ public class FPSCounter {
     public static Vector2     location;
     public static int     frameDisplay;
 
+    public static String extraMessage = "";
+
     private static int frameCount;
 
     public static void create() {
-        location = new Vector2(0, Tenkici.PrefferedHeight);
+        location = new Vector2(0, Graphics.prefferedHeight);
         frameCount = 0;
         timeLeft = 1.0f;
     }
@@ -35,6 +37,6 @@ public class FPSCounter {
     }
 
     public static void draw(SpriteBatch batch) {
-        Tenkici.font16.draw(batch, Integer.toString(frameDisplay), location.x, location.y);
+        Tenkici.font16.draw(batch, Integer.toString(frameDisplay) + " " + extraMessage, location.x, location.y);
     }
 }

@@ -63,18 +63,27 @@ public class Button {
         return buttonPressed;
     }
 
+    public boolean update(Vector2[] locations) {
+        prevButtonPressed = buttonPressed;
+        buttonPressed = false;
+        for (Vector2 loc : locations)
+            buttonPressed |= getScreenRectangle().contains(loc);
+
+        return buttonPressed;
+    }
+
     public void draw(SpriteBatch batch) {
         batch.draw(texture, screenLocation.x - width / 2, screenLocation.y - height / 2, width, height);
     }
 
     public boolean fingerOnButton(int index) {
-        Vector2 location = com.elvircrn.TankTrouble.android.Input.get(index);
+        Vector2 location = Input.get(index);
         return getScreenRectangle().contains(location);
     }
 
     //events
     public boolean justPressed() {
-        if (prevButtonPressed == false && buttonPressed == true)
+        if (!prevButtonPressed && buttonPressed)
             return true;
         else
             return false;

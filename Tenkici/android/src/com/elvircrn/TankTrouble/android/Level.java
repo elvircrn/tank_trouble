@@ -17,7 +17,7 @@ public class Level {
 
     public static final int HORIZONTAL = 0, VERTICAL = 1;
     public static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
-    public static int wallWidth = 8;
+    public static int wallWidth = 4;
 
     private static Rectangle ret;
 
@@ -34,15 +34,15 @@ public class Level {
     private static int[][] priority;
 
     public static int height, width;
-    public static com.elvircrn.TankTrouble.android.Tile[][] Tiles;
+    public static Tile[][] Tiles;
 
     private Level() { }
 
     public static void create() {
-        Tiles = new com.elvircrn.TankTrouble.android.Tile[10][10];
+        Tiles = new Tile[10][10];
         visited = new Boolean[10] [10];
         priority = new int[10] [10];
-        walls = new ArrayList<Wall>();
+        walls = new ArrayList<>();
         ret = new Rectangle();
     }
 
@@ -87,23 +87,23 @@ public class Level {
         width = widthParam;
         height = heightParam;
 
-        offset = new Vector2(Tenkici.PrefferedWidth / 2 - getMapPixelWidth() / 2, 0);
+        offset = new Vector2(Graphics.prefferedWidth / 2 - getMapPixelWidth() / 2, 0);
 
         for (int i = 0; i < width; i++)
             for (int j = 0; j < height; j++) {
                 visited[i][j] = false;
                 priority[i] [j] = 0;
-                Tiles[i] [j] = new com.elvircrn.TankTrouble.android.Tile(15);
+                Tiles[i] [j] = new Tile(15);
             }
 
         set_priorities(width, height);
 
-        PriorityQueue<com.elvircrn.TankTrouble.android.edge> Q = new PriorityQueue<com.elvircrn.TankTrouble.android.edge>();
+        PriorityQueue<edge> Q = new PriorityQueue<>();
 
-        Q.add(new com.elvircrn.TankTrouble.android.edge(0, 0, priority[0][0]));
+        Q.add(new edge(0, 0, priority[0][0]));
 
         while (!Q.isEmpty()) {
-            com.elvircrn.TankTrouble.android.edge help = Q.poll();
+            edge help = Q.poll();
 
             if (!visited[help.x] [help.y]) {
                 visited [help.x] [help.y] = true;
@@ -117,7 +117,7 @@ public class Level {
                     if (X < 0 || Y < 0 || X >= width || Y >= height || visited[X] [Y])
                         continue;
 
-                    Q.add(new com.elvircrn.TankTrouble.android.edge(help.x, help.y, X, Y, priority[X] [Y]));
+                    Q.add(new edge(help.x, help.y, X, Y, priority[X] [Y]));
                 }
             }
         }
@@ -131,7 +131,7 @@ public class Level {
 
 
     public static int getTileDimens() {
-        return (int)((Tenkici.PrefferedHeight - wallWidth) / height) - wallWidth;
+        return (int)((Graphics.prefferedHeight - wallWidth) / height) - wallWidth;
     }
 
     public static int getMapPixelWidth() {
@@ -144,9 +144,8 @@ public class Level {
 
     public static Vector2 pixelToTile(int x, int y) {
         int X = x - (int)offset.x;
-        int Y = y;
 
-        return new Vector2(X / width, Y / height);
+        return new Vector2(X / width, y / height);
     }
 
     public static Vector2 pixelToTile(Vector2 loc) {
@@ -156,14 +155,12 @@ public class Level {
     public static void Draw(SpriteBatch batch) {
         for (Wall wall : walls) {
             batch.draw(wallTexture, wall.x, wall.y, wall.width, wall.height);
-
-
         }
     }
 
     private static void generateWalls() {
         //Vertical
-        ArrayList<Wall> newWalls = new ArrayList<Wall>();
+        ArrayList<Wall> newWalls = new ArrayList<>();
         Vector2 beginning = new Vector2(), ending = new Vector2();
         for (int i = 0; i < width; i++) {
             beginning.x = -1;
@@ -211,15 +208,15 @@ public class Level {
                 }
             }
             if (beginning.x != -1) {
-                newWalls.add(new Wall((int)beginning.x, (int)beginning.y, (int)wallWidth, (int)ending.y - (int)beginning.y, VERTICAL));
+                newWalls.add(new Wall((int)beginning.x, (int)beginning.y, wallWidth, (int)ending.y - (int)beginning.y, VERTICAL));
             }
         }
 
         Gdx.app.log("top wall: ", "offset.x: " + Integer.toString((int)offset.x) +
-                                  "MyGdxGame.PrefferedHeight: " + Integer.toString((int) Tenkici.PrefferedHeight) +
+                                  "MyGdxGame.PrefferedHeight: " + Integer.toString((int) Graphics.prefferedHeight) +
                                   "getMapPixelWidth(): " + Integer.toString(getMapPixelWidth()));
 
-        newWalls.add(new Wall((int)offset.x, (int) Tenkici.PrefferedHeight - wallWidth, getMapPixelWidth(), wallWidth, HORIZONTAL));
+        newWalls.add(new Wall((int)offset.x, (int) Graphics.prefferedHeight - wallWidth, getMapPixelWidth(), wallWidth, HORIZONTAL));
         newWalls.add(new Wall((int)offset.x + getMapPixelWidth() - wallWidth, 0, wallWidth, getMapPixelHeight(), VERTICAL));
         newWalls.add(new Wall((int)offset.x, 0, getMapPixelWidth(), wallWidth, HORIZONTAL));
 

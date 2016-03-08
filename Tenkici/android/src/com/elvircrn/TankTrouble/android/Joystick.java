@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 public class Joystick {
     public int index;
 
-    public com.elvircrn.TankTrouble.android.Analog analog;
+    public Analog analog;
     public Button button;
 
     public Rectangle inputRegion;

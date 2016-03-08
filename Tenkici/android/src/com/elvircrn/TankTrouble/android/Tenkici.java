@@ -10,33 +10,54 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-
+import com.elvircrn.TankTrouble.android.Blue.BTManager;
 
 public class Tenkici extends ApplicationAdapter  {
-    public static float PrefferedWidth = 800, PrefferedHeight;
-
-    public static BitmapFont font16;
-
 	static SpriteBatch batch;
     static AssetManager manager;
 
     public static OrthographicCamera cam;
-
-    static boolean updateManager = false;
     public static FreeTypeFontGenerator generator;
-    public static float w, h;
+    static boolean updateManager = false;
 
+    //fonts
+    public static BitmapFont font16;
     static String fontChars = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890.:,; ' (!?) +-*/=";
-
     public static FreeTypeFontGenerator.FreeTypeFontParameter fontParameters;
+
+
+    //MAIN MENU KLASA
+    MainMenu glavni_meni;
+
+    //region Activity stuff
+
+    public interface MyGameCallback {
+        void onStartActivityBTActivity();
+        void onStartActivityServer();
+        void onStartActivityClient();
+    }
+
+    // Local variable to hold the callback implementation
+    public MyGameCallback myGameCallback;
+
+    // ** Additional **
+    // Setter for the callback
+    public void setMyGameCallback(MyGameCallback callback) {
+        myGameCallback = callback;
+    }
+    //endregion
+
 
 	@Override
 	public void create () {
-
         //state
-        StateManager.changeState(StateManager.State.MAINMENU);
+        StateManager.changeState(StateManager.State.MULTIPLAYER);
 
         //asset manager init OK
+        batch = new SpriteBatch();
+        manager = new AssetManager();
+
+        //fonts
         fontParameters = new FreeTypeFontGenerator.FreeTypeFontParameter();
         fontParameters.color = Color.BLACK;
         generator = new FreeTypeFontGenerator(Gdx.files.internal("data/ProFontWindows.ttf"));
@@ -44,11 +65,11 @@ public class Tenkici extends ApplicationAdapter  {
         batch = new SpriteBatch();
         manager = new AssetManager();
 
+        //Resolution init OK
+        Graphics.initValues();
+
         //camera init OK
-        w = Gdx.graphics.getWidth();
-        h = Gdx.graphics.getHeight();
-        PrefferedHeight = (h / w) * PrefferedWidth;
-        cam = new OrthographicCamera(PrefferedWidth, PrefferedHeight);
+        cam = new OrthographicCamera(Graphics.prefferedWidth, Graphics.prefferedHeight);
         cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
         cam.update();
 
@@ -56,8 +77,12 @@ public class Tenkici extends ApplicationAdapter  {
         GameMaster.createGame();
 
         //UI init
-        com.elvircrn.TankTrouble.android.PointsUI.init();
-        com.elvircrn.TankTrouble.android.FPSCounter.create();
+        FPSCounter.create();
+        glavni_meni = new MainMenu();
+        glavni_meni.create();
+
+        //bluetooth
+        BTManager.init();
 
         load();
     }
@@ -74,23 +99,17 @@ public class Tenkici extends ApplicationAdapter  {
     public void done() {
         TankManager.get(0).setTexture(manager.get("data/tankRed.png", Texture.class));
         TankManager.get(1).setTexture(manager.get("data/tankBlue.png", Texture.class));
-        com.elvircrn.TankTrouble.android.JoystickManager.get(0).setTexture(manager.get("data/joystick.png", Texture.class), manager.get("data/joystick.png", Texture.class));
-        com.elvircrn.TankTrouble.android.JoystickManager.get(1).setTexture(manager.get("data/joystick.png", Texture.class), manager.get("data/joystick.png", Texture.class));
+        JoystickManager.get(0).setTexture(manager.get("data/joystick.png", Texture.class), manager.get("data/joystick.png", Texture.class));
+        JoystickManager.get(1).setTexture(manager.get("data/joystick.png", Texture.class), manager.get("data/joystick.png", Texture.class));
+        BTManager.someButton.setTexture(manager.get("data/joystick.png", Texture.class));
         Level.tileTexture = manager.get("data/tile.png", Texture.class);
         Level.wallTexture = manager.get("data/wall.png", Texture.class);
-        com.elvircrn.TankTrouble.android.ExplosionManager.texture = manager.get("data/wall.png", Texture.class);
-        com.elvircrn.TankTrouble.android.Bullet.setTexture(manager.get("data/bullet.png", Texture.class));
+        ExplosionManager.texture = manager.get("data/wall.png", Texture.class);
+        Bullet.setTexture(manager.get("data/bullet.png", Texture.class));
     }
 
     public void update(float deltaTime) {
-        /* eh vedo ovdje ide igra */
-        if (StateManager.getCurrentState() == StateManager.State.GAME) {
-            GameMaster.update(deltaTime);
-        }
-        /* ovdje ide tvoje */
-        else if (StateManager.getCurrentState() == StateManager.State.MAINMENU) {
-            /* eh sad kad hoces da prebacis na igru samo kazes StateManager.changeState(StateManager.State.GAME) i tjt onda moj kod preuzima */
-        }
+        GameMaster.update(deltaTime);
     }
 
 	@Override
@@ -117,12 +136,14 @@ public class Tenkici extends ApplicationAdapter  {
 
         batch.begin();
 
-        if (StateManager.getCurrentState() == StateManager.State.GAME) {
+        if (StateManager.getCurrentState() == StateManager.State.MULTIPLAYER) {
             GameMaster.draw(batch);
         }
         else if (StateManager.getCurrentState() == StateManager.State.MAINMENU) {
-            /* ovdje ide tvoj kod koji bi isao za crtanje */
+            glavni_meni.render(batch);
         }
+
+        BTManager.draw(batch);
 
         batch.end();
 

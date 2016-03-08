@@ -29,10 +29,10 @@ public class Input {
                 float locX = (float)Gdx.input.getX(i);
                 float locY = (float)Gdx.input.getY(i);
 
-                locY = Tenkici.h - locY;
+                locY = Graphics.screenHeight - locY;
 
-                locX = (locX / Tenkici.w) * Tenkici.PrefferedWidth;
-                locY = (locY / Tenkici.h) * Tenkici.PrefferedHeight;
+                locX = (locX / Graphics.screenWidth) * Graphics.prefferedWidth;
+                locY = (locY / Graphics.screenHeight) * Graphics.prefferedHeight;
 
                 touchList[touchCount].set((float) Math.floor((double) locX), (float) Math.floor((double) locY));
                 touchCount++;

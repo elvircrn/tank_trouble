@@ -7,9 +7,9 @@ public class LevelManager {
     public static float scale;
 
     public static void initLevel() {
-        scale = Tenkici.PrefferedWidth / Tenkici.w;
-        int levelWidth = Random.getRange(10, 10), levelHeight = Random.getRange(10, 10);
-        //int levelWidth = Random.getRange(6, 8), levelHeight = Random.getRange(4, 6);
+        scale = Graphics.prefferedWidth / Graphics.screenWidth;
+        //int levelWidth = Random.getRange(10, 10), levelHeight = Random.getRange(10, 10);
+        int levelWidth = Random.getRange(6, 8), levelHeight = Random.getRange(4, 6);
         /*
         int dim;
         if (levelWidth < levelHeight)

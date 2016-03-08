@@ -8,13 +8,15 @@ import com.badlogic.gdx.utils.Pool;
  * Created by elvircrn on 2/14/2015.
  */
 public class BulletManager {
-    public static final Array<Bullet> bullets = new Array();
+    public static final Array<Bullet> bullets = new Array<>();
     public static final Pool<Bullet> bulletPool = new Pool<Bullet>() {
         @Override
         protected Bullet newObject() {
             return new Bullet();
         }
     };
+
+    protected static boolean lethal;
 
     public static void create(int width, int height) {
         Bullet.width = width;
@@ -25,14 +27,26 @@ public class BulletManager {
 
     }
 
+    public static boolean isLethal() {
+        return lethal;
+    }
+
+    public static void makeLethal() {
+        lethal = true;
+    }
+
+    public static void makeSafe() {
+        lethal = false;
+    }
+
     public static void addBullet(float x, float y, float dirX, float dirY, int owner) {
-        com.elvircrn.TankTrouble.android.Bullet bullet = bulletPool.obtain();
+        Bullet bullet = bulletPool.obtain();
         bullet.init(x, y, dirX, dirY, owner);
         bullets.add(bullet);
     }
 
     public static void update(float deltaTime) {
-        com.elvircrn.TankTrouble.android.Bullet bullet;
+        Bullet bullet;
         int n = bullets.size;
         for (int i = n - 1; i > -1; i--) {
             bullet = bullets.get(i);

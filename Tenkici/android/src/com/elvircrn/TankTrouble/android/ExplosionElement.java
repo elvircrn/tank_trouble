@@ -44,7 +44,7 @@ public class ExplosionElement {
     }
 
     public void draw(SpriteBatch batch) {
-        batch.draw(com.elvircrn.TankTrouble.android.ExplosionManager.texture,
+        batch.draw(ExplosionManager.texture,
                 collisionCircle.x - width / 2,
                 collisionCircle.y - width / 2,
                 width / 2,

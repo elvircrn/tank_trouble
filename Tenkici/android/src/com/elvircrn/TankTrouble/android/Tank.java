@@ -92,7 +92,7 @@ public class Tank {
     }
 
     private void initCollisionCircle() {
-        collisionRadius = (float)Math.sqrt((double)(width * width + height * height)) / 2.0f;
+        collisionRadius = (float)Math.sqrt((double)(width * width + height * height)) / 2.5f;
         collisionCircle.set(worldLocation.x, worldLocation.y, collisionRadius);
     }
 
@@ -178,5 +178,9 @@ public class Tank {
                    texture.getHeight(),
                    false,
                    false);
+    }
+
+    public float getCollisionRadius() {
+        return collisionRadius;
     }
 }

@@ -9,6 +9,7 @@
         android:targetSdkVersion="21" />
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <android:uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -30,6 +31,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Blue.ClientActivity" />
+        <activity android:name=".Blue.ServerActivity" />
+        <activity android:name=".Blue.EnableActivity"></activity>
     </application>
 
 </manifest>
