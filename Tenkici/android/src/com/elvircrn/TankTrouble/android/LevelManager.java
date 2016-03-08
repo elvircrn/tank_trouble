@@ -8,8 +8,8 @@ public class LevelManager {
 
     public static void initLevel() {
         scale = Graphics.prefferedWidth / Graphics.screenWidth;
-        //int levelWidth = Random.getRange(10, 10), levelHeight = Random.getRange(10, 10);
-        int levelWidth = Random.getRange(6, 8), levelHeight = Random.getRange(4, 6);
+        //int levelWidth = RandomWrapper.getRange(10, 10), levelHeight = RandomWrapper.getRange(10, 10);
+        int levelWidth = RandomWrapper.getRange(6, 8), levelHeight = RandomWrapper.getRange(4, 6);
         /*
         int dim;
         if (levelWidth < levelHeight)

@@ -16,6 +16,7 @@ public class Button {
     public Vector2 screenLocation; //set at center
     public float width, height;
     private Rectangle screenRectangle;
+    public SimpleText text = null;
 
     public int index;
 
@@ -38,7 +39,41 @@ public class Button {
         prevButtonPressed = false;
     }
 
+    public Button(int index, float locX, float locY, float width, float height, SimpleText text) {
+        screenRectangle = new Rectangle();
+        this.index = index;
+        screenLocation = new Vector2(locX, locY);
+        this.width = width;
+        this.height = height;
+        buttonPressed = false;
+        prevButtonPressed = false;
+        this.text = text;
+    }
+
+    public Button(int index, float locX, float locY, float width, float height, String text) {
+        screenRectangle = new Rectangle();
+        this.index = index;
+        screenLocation = new Vector2(locX, locY);
+        this.width = width;
+        this.height = height;
+        buttonPressed = false;
+        prevButtonPressed = false;
+        this.text = new SimpleText (screenLocation, text);
+    }
+
+
     //instance methods
+    public void init(int index, float locX, float locY, float width, float height, SimpleText text) {
+        this.text = text;
+        this.index = index;
+        screenLocation.set(locX, locY);
+        this.width = width;
+        this.height = height;
+        buttonPressed = false;
+        prevButtonPressed = false;
+        text.set(text.getLocation(), text.getText());
+    }
+
     public void init(int index, float locX, float locY, float width, float height) {
         this.index = index;
         screenLocation.set(locX, locY);
@@ -46,6 +81,16 @@ public class Button {
         this.height = height;
         buttonPressed = false;
         prevButtonPressed = false;
+    }
+
+    public void init(int index, float locX, float locY, float width, float height, Vector2 location, String text) {
+        this.index = index;
+        screenLocation.set(locX, locY);
+        this.width = width;
+        this.height = height;
+        buttonPressed = false;
+        prevButtonPressed = false;
+        this.text.set(location, text);
     }
 
     public void setTexture(Texture texture) {
@@ -74,6 +119,9 @@ public class Button {
 
     public void draw(SpriteBatch batch) {
         batch.draw(texture, screenLocation.x - width / 2, screenLocation.y - height / 2, width, height);
+
+        if (text != null)
+            text.draw(batch);
     }
 
     public boolean fingerOnButton(int index) {

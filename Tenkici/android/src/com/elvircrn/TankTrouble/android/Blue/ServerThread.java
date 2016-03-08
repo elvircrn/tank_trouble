@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+import com.elvircrn.TankTrouble.android.GameMaster;
+
 import java.io.IOException;
 
 public class ServerThread extends Thread {
@@ -27,6 +29,7 @@ public class ServerThread extends Thread {
         }
 
         serverSocket = tmp;
+        GameMaster.setMode(GameMaster.Mode.SERVER);
     }
 
     public void run() {

@@ -4,6 +4,9 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+import com.elvircrn.TankTrouble.android.FPSCounter;
+import com.elvircrn.TankTrouble.android.GameMaster;
+
 import java.io.IOException;
 
 /**
@@ -39,8 +42,11 @@ public class ClientThread extends Thread {
         }
         catch (IOException e) {
             Log.d("CONNECTTHREAD constr", e.getMessage());
+            return;
         }
+
         this.bluetoothSocket = tmp;
+        GameMaster.setMode(GameMaster.Mode.CLIENT);
     }
 
     @Override
@@ -60,12 +66,14 @@ public class ClientThread extends Thread {
                 return;
             }
             return;
-        }
+        };
+
+        Log.d("CLEINT run", "Connection to server established");
 
         BTManager.handshake = new ManageConnectThread(bluetoothSocket);
         BTManager.handshake.start();
 
-        return;
+        FPSCounter.extraMessage = "HANDSHAKE";
     }
 
     public boolean cancel() {

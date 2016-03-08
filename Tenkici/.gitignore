@@ -22,7 +22,6 @@ android/libs/armeabi/
 android/libs/armeabi-v7a/
 android/libs/x86/
 android/gen/
-.idea/
 *.ipr
 *.iws
 *.iml
@@ -39,8 +38,6 @@ tmp/
 *.bak
 *.swp
 *~.nib
-local.properties
-.settings/
 .loadpath
 .externalToolBuilders/
 *.launch

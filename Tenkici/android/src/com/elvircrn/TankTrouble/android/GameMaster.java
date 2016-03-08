@@ -1,10 +1,14 @@
 package com.elvircrn.TankTrouble.android;
 
+import android.util.Log;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.elvircrn.TankTrouble.android.Blue.BTManager;
+
+import java.io.IOException;
 
 /**
  * Created by elvircrn on 3/5/2015.
@@ -30,8 +34,20 @@ public class GameMaster {
         Bullets [ ]
      */
 
+    public enum Mode { SERVER, CLIENT };
+
+    private static Mode mode;
+
     public static int playerCount = 2;
     public static float globalRatio;
+
+    public static Mode getMode() {
+        return mode;
+    }
+
+    public static void setMode(Mode mode) {
+        GameMaster.mode = mode;
+    }
 
     public static void createGame() {
         //initialize all static variables
@@ -45,6 +61,8 @@ public class GameMaster {
         //create objects
         initJoysticks();
         initTanks();
+
+        BulletManager.makeSafe();
     }
 
     private static void initTanks() {
@@ -87,7 +105,26 @@ public class GameMaster {
                 0.10f * Graphics.prefferedWidth,
                 0.05f * Graphics.prefferedWidth);
 
-        BTManager.someButton = new Button(2, Graphics.prefferedWidth / 2, Graphics.prefferedHeight / 2, 0.10f * Graphics.prefferedWidth, 0.10f * Graphics.prefferedWidth);
+        BTManager.serverButton = new Button(101,
+                                            Graphics.prefferedWidth / 2 - 10,
+                                            Graphics.prefferedHeight / 2 - 0.20f * Graphics.prefferedWidth,
+                                            0.10f * Graphics.prefferedWidth,
+                                            0.10f * Graphics.prefferedWidth,
+                                            "server");
+
+        BTManager.clientButton = new Button(102,
+                Graphics.prefferedWidth / 2 - 10,
+                Graphics.prefferedHeight / 2 + 0.20f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth,
+                "client");
+
+        BTManager.syncButton = new Button(103,
+                Graphics.prefferedWidth / 2,
+                Graphics.prefferedHeight / 2,
+                0.10f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth,
+                "sync");
 
         JoystickManager.get(0).setInputRegion(new Rectangle(0, 0, Graphics.prefferedWidth / 2, Graphics.prefferedHeight));
         JoystickManager.get(1).setInputRegion(new Rectangle(Graphics.prefferedWidth / 2, 0, Graphics.prefferedWidth / 2, Graphics.prefferedHeight));
@@ -101,6 +138,33 @@ public class GameMaster {
         BulletManager.update(deltaTime);
         BTManager.update();
         tankBulletCollision();
+        updateBluetooth(deltaTime);
+    }
+
+    public static void updateBluetooth(float deltaTime) {
+
+        if (BTManager.serverButton.justPressed()) {
+            AndroidLauncher.tenkici.myGameCallback.onStartActivityServer();
+        }
+
+        if (BTManager.clientButton.justPressed()) {
+            AndroidLauncher.tenkici.myGameCallback.onStartActivityClient();
+        }
+
+        if (BTManager.syncButton.justPressed()) {
+            if (mode == Mode.CLIENT) {
+                while (true) {
+                    String request = String.valueOf(CodeManager.RequestNewGame);
+                    try {
+                        BTManager.sendData(request.getBytes());
+                        break;
+                    } catch (IOException e) {
+                        Log.d("SYNC PRESSED", e.getMessage());
+                        continue;
+                    }
+                }
+            }
+        }
     }
 
     public static void draw(SpriteBatch batch) {
@@ -135,10 +199,20 @@ public class GameMaster {
         initNewRound();
     }
 
-
-
     public static void initNewRound() {
         BulletManager.clearBullets();
+        LevelManager.initLevel();
+        Vector2 tankOne = Level.tileToScreen(0, 0);
+        Vector2 tankTwo = Level.tileToScreen(Level.width - 1, Level.height - 1);
+
+        float tankDimens = (2.0f * Level.getTileDimens()) / 5.0f;
+        TankManager.get(0).spawnTo(tankOne.x + Level.getTileDimens() / 2, tankOne.y + Level.getTileDimens() / 2, JoystickManager.get(0).analog.getNorAngle(), tankDimens, tankDimens);
+        TankManager.get(1).spawnTo(tankTwo.x + Level.getTileDimens() / 2, tankTwo.y + Level.getTileDimens() / 2, JoystickManager.get(1).analog.getNorAngle(), tankDimens, tankDimens);
+    }
+
+    public static void initNewRound(int seed) {
+        BulletManager.clearBullets();
+        RandomWrapper.init(seed);
         LevelManager.initLevel();
         Vector2 tankOne = Level.tileToScreen(0, 0);
         Vector2 tankTwo = Level.tileToScreen(Level.width - 1, Level.height - 1);

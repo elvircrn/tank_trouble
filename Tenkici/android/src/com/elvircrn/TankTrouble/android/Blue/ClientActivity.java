@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.badlogic.gdx.Gdx;
 import com.elvircrn.TankTrouble.android.R;
 
 import java.io.IOException;
@@ -36,7 +35,7 @@ public class ClientActivity extends Activity {
             public void onClick(View view) {
                 String s = "Hello World";
                 try {
-                    BTManager.handshake.sendData(s.getBytes());
+                    BTManager.sendData(s.getBytes());
                 }
                 catch (IOException e) {
                     Log.d("CLIENTACTIVITY send", e.getMessage());
@@ -48,7 +47,7 @@ public class ClientActivity extends Activity {
     private void addDevice(BluetoothDevice device) {
         String candidate = device.getName() + " " + device.getAddress();
 
-        Gdx.app.log("device found: ", device.getName() + " " + device.getAddress());
+        Log.d("device found: ", device.getName() + " " + device.getAddress());
 
         for (int i = 0; i < listAdapter.getCount(); i++)
             if (listAdapter.getItem(i) == candidate)
@@ -70,9 +69,9 @@ public class ClientActivity extends Activity {
 
     protected void initializeList() {
         list = (ListView)findViewById(R.id.listView);
-        deviceList = new ArrayList<String>();
-        remoteDevices = new ArrayList<BluetoothDevice>();
-        listAdapter = new ArrayAdapter<String>(this, R.layout.simplerow, deviceList);
+        deviceList = new ArrayList<>();
+        remoteDevices = new ArrayList<>();
+        listAdapter = new ArrayAdapter<>(this, R.layout.simplerow, deviceList);
         list.setAdapter(listAdapter);
 
         Set<BluetoothDevice> bonded = BTManager.bluetoothAdapter.getBondedDevices();

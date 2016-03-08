@@ -1,12 +1,20 @@
 package com.elvircrn.TankTrouble.android;
 
-/**
- * Created by elvircrn on 2/18/2015.
- */
-public class Random {
+import java.util.Random;
+
+public class RandomWrapper {
+    public static Random generator;
+
+    public static void init() {
+        generator = new Random();
+    }
+
+    public static void init(long seed) {
+        generator.setSeed(seed);
+    }
 
     public static int getRand() {
-        return (int)(Math.random() * 100000.0f);
+        return generator.nextInt() * 100000;
     }
 
     public static int getRand(int maximum) {

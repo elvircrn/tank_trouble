@@ -3,11 +3,7 @@ package com.elvircrn.TankTrouble.android;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-/**
- * Created by elvircrn on 3/4/2015.
- */
 public class FPSCounter {
-
     public static float       timeLeft;
     public static Vector2     location;
     public static int     frameDisplay;

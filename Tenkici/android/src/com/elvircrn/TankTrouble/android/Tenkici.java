@@ -50,6 +50,9 @@ public class Tenkici extends ApplicationAdapter  {
 
 	@Override
 	public void create () {
+        //Random
+        RandomWrapper.init();
+
         //state
         StateManager.changeState(StateManager.State.MULTIPLAYER);
 
@@ -99,12 +102,19 @@ public class Tenkici extends ApplicationAdapter  {
     public void done() {
         TankManager.get(0).setTexture(manager.get("data/tankRed.png", Texture.class));
         TankManager.get(1).setTexture(manager.get("data/tankBlue.png", Texture.class));
+
         JoystickManager.get(0).setTexture(manager.get("data/joystick.png", Texture.class), manager.get("data/joystick.png", Texture.class));
         JoystickManager.get(1).setTexture(manager.get("data/joystick.png", Texture.class), manager.get("data/joystick.png", Texture.class));
-        BTManager.someButton.setTexture(manager.get("data/joystick.png", Texture.class));
+
+        BTManager.clientButton.setTexture(manager.get("data/joystick.png", Texture.class));
+        BTManager.serverButton.setTexture(manager.get("data/joystick.png", Texture.class));
+        BTManager.syncButton.setTexture(manager.get("data/joystick.png", Texture.class));
+
         Level.tileTexture = manager.get("data/tile.png", Texture.class);
         Level.wallTexture = manager.get("data/wall.png", Texture.class);
+
         ExplosionManager.texture = manager.get("data/wall.png", Texture.class);
+
         Bullet.setTexture(manager.get("data/bullet.png", Texture.class));
     }
 

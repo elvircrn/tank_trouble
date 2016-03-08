@@ -19,14 +19,6 @@ public class JoystickManager {
         for (int i = 0; i < GameMaster.playerCount; i++) {
             joysticks[i].update(deltaTime);
         }
-
-        if (joysticks [0].button.justPressed()) {
-            AndroidLauncher.tenkici.myGameCallback.onStartActivityServer();
-        }
-
-        if (joysticks [1].button.justPressed()) {
-            AndroidLauncher.tenkici.myGameCallback.onStartActivityClient();
-        }
     }
 
     public static void draw(SpriteBatch batch) {

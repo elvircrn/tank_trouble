@@ -3,8 +3,6 @@ package com.elvircrn.TankTrouble.android.Blue;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-import com.elvircrn.TankTrouble.android.FPSCounter;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,10 +39,12 @@ public class ManageConnectThread extends Thread {
         byte[] buffer = new byte[1024];
         int bytes;
 
+        Log.d("MANAGECONNECT", "Establishing handshake");
+
         while (true) {
             try {
                 bytes = inputStream.read(buffer);
-                FPSCounter.extraMessage = new String(buffer);
+                BTManager.receiveData(bytes, buffer);
             }
             catch (IOException e) {
                 Log.d("MANAGECONNECT run", e.getMessage());
