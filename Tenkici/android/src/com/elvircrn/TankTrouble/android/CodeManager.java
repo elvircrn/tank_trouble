@@ -1,7 +1,7 @@
 package com.elvircrn.TankTrouble.android;
 
 public class CodeManager {
-    public static char RequestNewGame = 'N';
-    public static char NewGameResponse = 'R';
-    public static char Seed = 'S';
+    public static short RequestNewGame = 1;
+    public static short NewGameResponse = 2;
+    public static short Seed = 3;
 }

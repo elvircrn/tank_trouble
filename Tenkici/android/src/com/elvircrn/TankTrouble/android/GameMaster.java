@@ -142,7 +142,6 @@ public class GameMaster {
     }
 
     public static void updateBluetooth(float deltaTime) {
-
         if (BTManager.serverButton.justPressed()) {
             AndroidLauncher.tenkici.myGameCallback.onStartActivityServer();
         }
