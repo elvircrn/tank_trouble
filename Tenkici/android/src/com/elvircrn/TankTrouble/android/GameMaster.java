@@ -10,9 +10,6 @@ import com.elvircrn.TankTrouble.android.Blue.BTManager;
 
 import java.io.IOException;
 
-/**
- * Created by elvircrn on 3/5/2015.
- */
 public class GameMaster {
     /*
     elements of a game:
@@ -34,7 +31,7 @@ public class GameMaster {
         Bullets [ ]
      */
 
-    public enum Mode { SERVER, CLIENT };
+    public enum Mode { SERVER, CLIENT }
 
     private static Mode mode;
 
@@ -62,7 +59,7 @@ public class GameMaster {
         initJoysticks();
         initTanks();
 
-        BulletManager.makeSafe();
+        BulletManager.makeLethal();
     }
 
     private static void initTanks() {
@@ -106,11 +103,11 @@ public class GameMaster {
                 0.05f * Graphics.prefferedWidth);
 
         BTManager.serverButton = new Button(101,
-                                            Graphics.prefferedWidth / 2 - 10,
-                                            Graphics.prefferedHeight / 2 - 0.20f * Graphics.prefferedWidth,
-                                            0.10f * Graphics.prefferedWidth,
-                                            0.10f * Graphics.prefferedWidth,
-                                            "server");
+                Graphics.prefferedWidth / 2 - 10,
+                Graphics.prefferedHeight / 2 - 0.20f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth,
+                "server");
 
         BTManager.clientButton = new Button(102,
                 Graphics.prefferedWidth / 2 - 10,
@@ -142,6 +139,8 @@ public class GameMaster {
     }
 
     public static void updateBluetooth(float deltaTime) {
+        ByteArrayList messageBuffer = new ByteArrayList();
+
         if (BTManager.serverButton.justPressed()) {
             AndroidLauncher.tenkici.myGameCallback.onStartActivityServer();
         }
@@ -151,17 +150,29 @@ public class GameMaster {
         }
 
         if (BTManager.syncButton.justPressed()) {
+            Log.d("-", "REGISTERED SYNC BUTTON PRESS");
             if (mode == Mode.CLIENT) {
-                while (true) {
-                    String request = String.valueOf(CodeManager.RequestNewGame);
-                    try {
-                        BTManager.sendData(request.getBytes());
-                        break;
-                    } catch (IOException e) {
-                        Log.d("SYNC PRESSED", e.getMessage());
-                        continue;
-                    }
+                try {
+                    ByteArrayList message = new ByteArrayList(3);
+                    Serializer.serializeMessage(message, CodeManager.RequestNewGame);
+                    BTManager.sendData(message.getContents());
+                    Log.d("SYNC PRESSED", "OK");
+                } catch (IOException e) {
+                    Log.d("SYNC PRESSED FAIL", e.getMessage());
                 }
+
+            } else {
+                Log.d("FUCK", "WHAT THE FUCK");
+            }
+        }
+
+        if (mode == Mode.CLIENT) {
+            ClientManager.writeTankLocation(messageBuffer);
+            try {
+                BTManager.sendData(messageBuffer.getContents());
+            }
+            catch (IOException e) {
+                Log.d("CLIENT", "failed to send tank data");
             }
         }
     }
@@ -209,10 +220,10 @@ public class GameMaster {
         TankManager.get(1).spawnTo(tankTwo.x + Level.getTileDimens() / 2, tankTwo.y + Level.getTileDimens() / 2, JoystickManager.get(1).analog.getNorAngle(), tankDimens, tankDimens);
     }
 
-    public static void initNewRound(int seed) {
+    public static void initNewRound(short seed) {
         BulletManager.clearBullets();
-        RandomWrapper.init(seed);
-        LevelManager.initLevel();
+
+        LevelManager.initLevel(seed);
         Vector2 tankOne = Level.tileToScreen(0, 0);
         Vector2 tankTwo = Level.tileToScreen(Level.width - 1, Level.height - 1);
 

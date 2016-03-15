@@ -25,8 +25,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Send Hello"
-            android:id="@+id/sendHelloButton"
+            android:text="Refresh"
+            android:id="@+id/refreshButton"
             android:layout_gravity="center_horizontal" />
 
     </LinearLayout>

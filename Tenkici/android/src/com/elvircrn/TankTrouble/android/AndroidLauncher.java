@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.elvircrn.TankTrouble.android.Blue.BTActivity;
 import com.elvircrn.TankTrouble.android.Blue.ClientActivity;
 import com.elvircrn.TankTrouble.android.Blue.ServerActivity;
 
@@ -21,18 +20,10 @@ public class AndroidLauncher extends AndroidApplication implements Tenkici.MyGam
 		config.useAccelerometer = false;
 		config.useCompass = false;
 
-		//Create an instance of MyGame, and set the callback
 		tenkici = new Tenkici();
-		// Since AndroidLauncher implements MyGame.MyGameCallback, we can just pass 'this' to the callback setter.
 		tenkici.setMyGameCallback(this);
 
 		initialize(tenkici, config);
-	}
-
-	@Override
-	public void onStartActivityBTActivity() {
-		Intent intent = new Intent(this, BTActivity.class);
-		startActivity(intent);
 	}
 
 	@Override
@@ -45,5 +36,15 @@ public class AndroidLauncher extends AndroidApplication implements Tenkici.MyGam
 	public void onStartActivityClient() {
 		Intent intent = new Intent(this, ClientActivity.class);
 		startActivity(intent);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
 	}
 }

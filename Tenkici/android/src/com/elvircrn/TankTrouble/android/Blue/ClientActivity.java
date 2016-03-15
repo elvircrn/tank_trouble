@@ -16,9 +16,7 @@ import android.widget.ListView;
 
 import com.elvircrn.TankTrouble.android.R;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Set;
 
 public class ClientActivity extends Activity {
     public static final int REQUEST_ENABLE_BT = 1;
@@ -27,19 +25,13 @@ public class ClientActivity extends Activity {
     private ArrayList<String> deviceList;
     private ArrayList<BluetoothDevice> remoteDevices;
     private ArrayAdapter<String> listAdapter;
+    private boolean isReceiverActive = false;
 
     private void initButtons() {
-        android.widget.Button button = (android.widget.Button)findViewById(R.id.sendHelloButton);
+        android.widget.Button button = (android.widget.Button)findViewById(R.id.refreshButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String s = "Hello World";
-                try {
-                    BTManager.sendData(s.getBytes());
-                }
-                catch (IOException e) {
-                    Log.d("CLIENTACTIVITY send", e.getMessage());
-                }
             }
         });
     }
@@ -74,23 +66,18 @@ public class ClientActivity extends Activity {
         listAdapter = new ArrayAdapter<>(this, R.layout.simplerow, deviceList);
         list.setAdapter(listAdapter);
 
-        Set<BluetoothDevice> bonded = BTManager.bluetoothAdapter.getBondedDevices();
-
-        for (BluetoothDevice device : bonded)
-            addDevice(device);
-
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (BTManager.clientThread == null)
                     BTManager.clientThread = new ClientThread();
 
-                if (BTManager.clientThread.getState() != Thread.State.NEW) {
+                if (BTManager.clientThread.isAlive()) {
                     BTManager.clientThread.cancel();
                     BTManager.clientThread.init(remoteDevices.get(i));
                     BTManager.clientThread.start();
                 }
-                else if (BTManager.clientThread.getState() == Thread.State.NEW) {
+                else {
                     BTManager.clientThread.init(remoteDevices.get(i));
                     BTManager.clientThread.start();
                 }
@@ -102,7 +89,14 @@ public class ClientActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
-        registerReceiver(broadcastReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+
+        Log.d("CLIENTACTIVITY", "onCreate called");
+
+        if (!isReceiverActive) {
+            Log.d("CLIENT", "onCreate isReceiverActive = true");
+            registerReceiver(broadcastReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+            isReceiverActive = true;
+        }
 
         BTManager.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -120,5 +114,39 @@ public class ClientActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         finishActivity(REQUEST_ENABLE_BT);
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d("CLIENT", "onPause called");
+
+        super.onPause();
+
+        if (isReceiverActive) {
+            try {
+                unregisterReceiver(broadcastReceiver);
+            } catch (IllegalArgumentException e) {
+                Log.d("...", e.getMessage());
+            }
+
+            isReceiverActive = false;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (isReceiverActive) {
+            unregisterReceiver(broadcastReceiver);
+            isReceiverActive = false;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d("RESUME", "onResume called");
+        super.onResume();
+
     }
 }

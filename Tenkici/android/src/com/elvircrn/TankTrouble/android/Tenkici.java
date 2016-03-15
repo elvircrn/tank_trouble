@@ -32,7 +32,6 @@ public class Tenkici extends ApplicationAdapter  {
     //region Activity stuff
 
     public interface MyGameCallback {
-        void onStartActivityBTActivity();
         void onStartActivityServer();
         void onStartActivityClient();
     }

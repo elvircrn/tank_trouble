@@ -19,14 +19,16 @@ public class Level {
     public static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
     public static int wallWidth = 4;
 
+    private static short currentSeed;
+
     private static Rectangle ret;
 
     public static Texture tileTexture, wallTexture;
 
     public static Vector2 offset;
 
-    public static int[] dirX = new int[]{ 0, 1, 0, -1, 1, 1, -1, -1 };
-    public static int[] dirY = new int[]{ 1, 0, -1, 0, 1, -1, 1, -1 };
+    private static int[] dirX = new int[]{ 0, 1, 0, -1, 1, 1, -1, -1 };
+    private static int[] dirY = new int[]{ 1, 0, -1, 0, 1, -1, 1, -1 };
 
     public static ArrayList<Wall> walls;
 
@@ -39,19 +41,27 @@ public class Level {
     private Level() { }
 
     public static void create() {
-        Tiles = new Tile[10][10];
-        visited = new Boolean[10] [10];
-        priority = new int[10] [10];
-        walls = new ArrayList<>();
-        ret = new Rectangle();
+        priority  = new int[10] [10];
+        Tiles     = new Tile[10][10];
+        visited   = new Boolean[10] [10];
+        walls     = new ArrayList<>();
+        ret       = new Rectangle();
     }
 
     public static void set_priorities(int width, int height) {
         for (int i = 0; i < width; i++)
             for (int j = 0; j < height; j++)
-                priority[i] [j] = (int)(Math.random() * 10000.0f);
+                priority[i] [j] = RandomWrapper.getRand();
     }
 
+    public static short getCurrentSeed() {
+        return currentSeed;
+    }
+
+    public static void setCurrentSeed(short seed) {
+        currentSeed = seed;
+        RandomWrapper.init(seed);
+    }
     public static void destroy_wall(int px, int py, int x, int y) {
         //right
         if (px < x) {

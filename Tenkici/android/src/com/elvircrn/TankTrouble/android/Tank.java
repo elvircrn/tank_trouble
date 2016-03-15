@@ -7,9 +7,6 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-/**
- * Created by elvircrn on 2/14/2015.
- */
 public class Tank {
     //static properties
     public static float tankSpeed = 100.0f;
@@ -149,7 +146,7 @@ public class Tank {
 
         if (JoystickManager.get(index).moving()) {
             rotation = JoystickManager.get(index).analog.getNorAngle();
-            moveDirection = new Vector2(JoystickManager.get(index).analog.getNorDirection());
+            moveDirection.set(JoystickManager.get(index).analog.getNorDirection());
             moveTo(deltaTime);
         }
 

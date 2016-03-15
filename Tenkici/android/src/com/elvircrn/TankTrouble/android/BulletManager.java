@@ -4,9 +4,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
-/**
- * Created by elvircrn on 2/14/2015.
- */
 public class BulletManager {
     public static final Array<Bullet> bullets = new Array<>();
     public static final Pool<Bullet> bulletPool = new Pool<Bullet>() {

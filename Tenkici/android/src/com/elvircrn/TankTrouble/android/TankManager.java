@@ -2,9 +2,6 @@ package com.elvircrn.TankTrouble.android;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-/**
- * Created by elvircrn on 3/4/2015.
- */
 public class TankManager {
     public static Tank[] tanks;
 

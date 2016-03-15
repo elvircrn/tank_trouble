@@ -16,6 +16,9 @@ public class ServerThread extends Thread {
     }
 
     public void init() throws Exception {
+        if (isAlive())
+            return;
+
         if (BTManager.bluetoothAdapter == null)
             throw new Exception("SERVER init: BluetoothAdapter doesn't exist");
 

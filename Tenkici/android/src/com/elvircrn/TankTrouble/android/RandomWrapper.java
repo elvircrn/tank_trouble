@@ -3,28 +3,28 @@ package com.elvircrn.TankTrouble.android;
 import java.util.Random;
 
 public class RandomWrapper {
-    public static Random generator;
+    public static Random generator = null;
 
     public static void init() {
-        generator = new Random();
+        if (generator == null)
+            generator = new Random();
     }
 
-    public static void init(long seed) {
+    public static void init(short seed) {
+        if (generator == null)
+            init();
         generator.setSeed(seed);
     }
 
     public static int getRand() {
-        return generator.nextInt() * 100000;
+        return generator.nextInt();
     }
 
     public static int getRand(int maximum) {
-        if (maximum == 0)
-            return 0;
-        else
-            return getRand() % maximum;
+        return generator.nextInt(maximum);
     }
 
-    public static int getRange(int minimum, int maximum) {
-        return minimum + getRand(maximum - minimum);
+    public static int getRand(int minimum, int maximum) {
+        return minimum + getRand(maximum - minimum + 1);
     }
 }

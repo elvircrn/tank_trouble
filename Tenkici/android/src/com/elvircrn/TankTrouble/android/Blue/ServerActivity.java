@@ -13,6 +13,7 @@ import com.elvircrn.TankTrouble.android.R;
 public class ServerActivity extends Activity {
     public static final int REQUEST_ENABLE_BT = 1;
 
+
     public void initButton() {
         android.widget.Button button = (android.widget.Button)findViewById(R.id.startServerButton);
         button.setOnClickListener(new View.OnClickListener() {

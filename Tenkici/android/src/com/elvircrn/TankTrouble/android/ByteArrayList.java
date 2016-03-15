@@ -22,8 +22,8 @@ import java.util.Arrays;
  */
 public class ByteArrayList {
     private byte[] mStorage;
-    /** arbitrarily choose 128 bytes as the default size */
-    private int mMaxBytes = 128;
+    /** arbitrarily choose 10 bytes as the default size */
+    private int mMaxBytes = 10;
     private int mCurBytes = 0;
     private float mGrowthFactor = 2.0f;
     /**
@@ -171,6 +171,14 @@ public class ByteArrayList {
         }
         return addAll(src.getContents());
     }
+
+    public boolean addShort(short number) {
+        add(Serializer.getByte0(number));
+        add(Serializer.getByte1(number));
+
+        return true;
+    }
+
     /**
      * Removes all of the elements from this list.
      */

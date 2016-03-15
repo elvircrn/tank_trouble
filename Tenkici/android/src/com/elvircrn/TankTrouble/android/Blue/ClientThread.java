@@ -54,6 +54,7 @@ public class ClientThread extends Thread {
         BTManager.bluetoothAdapter.cancelDiscovery();
 
         try {
+            Log.d("CONNECTTHREAD run", "connecting to server");
             bluetoothSocket.connect();
         }
         catch(IOException connectException) {
