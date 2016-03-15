@@ -158,6 +158,8 @@ public class Tank {
     public void draw(SpriteBatch batch) {
         if (!drawable)
             return;
+
+        getCollisionCircle();
         
         batch.draw(texture,
                    collisionCircle.x - width / 2,

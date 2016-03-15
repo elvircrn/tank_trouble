@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 public class FPSCounter {
-    public static float       timeLeft;
-    public static Vector2     location;
     public static int     frameDisplay;
+    public static float   timeLeft;
+    public static Vector2 location;
 
     public static String extraMessage = "";
 
@@ -33,6 +33,13 @@ public class FPSCounter {
     }
 
     public static void draw(SpriteBatch batch) {
-        Tenkici.font16.draw(batch, Integer.toString(frameDisplay) + " " + extraMessage, location.x, location.y);
+        /*String text = Integer.toString(frameDisplay) + " " + extraMessage + "\n"
+                + "RED: " + Float.toString(TankManager.tanks [0].worldLocation.x) + " "
+                + Float.toString(TankManager.tanks [0].worldLocation.y) + "   BLUE: " +
+                Float.toString(TankManager.tanks [1].worldLocation.x) + " "
+                + Float.toString(TankManager.tanks [1].worldLocation.y);
+        Tenkici.font16.draw(batch, text, location.x, location.y);*/
     }
 }
+
+

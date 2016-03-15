@@ -1,5 +1,7 @@
 package com.elvircrn.TankTrouble.android;
 
+import android.util.Log;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -8,10 +10,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;
-
-/**
- * Created by elvircrn on 2/14/2015.
- */
 
 public class Level {
 
@@ -233,6 +231,8 @@ public class Level {
         for (Wall wall : newWalls)
             if (wall.width > 2 * wallWidth || wall.height > 2 * wallWidth)
                 walls.add(wall);
+
+        DebugWalls();
     }
 
     public static void getWallRectangle(Rectangle rec, int x, int y, int direction) {
@@ -274,6 +274,12 @@ public class Level {
 
     public static int approxY(float y) {
         return (int)((y - offset.y) / (getTileDimens() + wallWidth));
+    }
+
+    public static void DebugWalls() {
+        for (Wall wall : walls) {
+            Log.d("WALL: ", Integer.toString(wall.x) + " " + Integer.toString(wall.y) + " " + Integer.toString(wall.width) + " " + Integer.toString(wall.height));
+        }
     }
 
     public static void Debug(String logTag) {

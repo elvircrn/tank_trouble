@@ -3,10 +3,10 @@ package com.elvircrn.TankTrouble.android.Blue;
 import android.bluetooth.BluetoothAdapter;
 import android.util.Log;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.elvircrn.TankTrouble.android.Button;
 import com.elvircrn.TankTrouble.android.ByteArrayList;
+import com.elvircrn.TankTrouble.android.ClientManager;
 import com.elvircrn.TankTrouble.android.CodeManager;
 import com.elvircrn.TankTrouble.android.GameMaster;
 import com.elvircrn.TankTrouble.android.Input;
@@ -67,31 +67,31 @@ public class BTManager {
     public static void sendData(byte[] data) throws IOException {
         int nBytes = data [0];
         String debugMessage = "";
-        Log.d("sendData", "SEND DATA CALLED");
+        //Log.d("sendData", "SEND DATA CALLED");
         for (int i = 0; i < nBytes; i++)
             debugMessage += (Integer.toString((int)data [i]) + " ");
-        Gdx.app.log("sending: ", debugMessage);
+        //Gdx.app.log("sending: ", debugMessage);
         handshake.sendData(data);
     }
 
     public static void receiveData(int arg, byte[] data) throws IOException {
         byte code, nBytes = data[0];
 
-        Log.d("recevie", "RECEIVE DATA CALLED");
+        //Log.d("recevie", "RECEIVE DATA CALLED");
 
         try {
             Serializer.deserializeMessage(shorts, nBytes, data);
-            Log.d("received: ", "code: " + Byte.toString(data[0]));
+        //    Log.d("received: ", "code: " + Byte.toString(data[0]));
             code = data[1];
         }
         catch (Exception e) {
-            Log.d("RECEIVEDT: ", e.getMessage());
+          //  Log.d("RECEIVEDT: ", e.getMessage());
             return;
         }
 
         if (code == CodeManager.NewGameResponse) {
             short seed = shorts[1];
-            Log.d("RECEIVE", "NEW GAME RESPONSE " + Short.toString(seed));
+            //Log.d("RECEIVE", "NEW GAME RESPONSE " + Short.toString(seed));
             GameMaster.initNewRound(seed);
         }
         else if (code == CodeManager.RequestNewGame) {
@@ -99,7 +99,7 @@ public class BTManager {
             GameMaster.initNewRound(seed);
 
             try {
-                Log.d("PROCESSING", "REQUEST NEW GAME CALL");
+              //  Log.d("PROCESSING", "REQUEST NEW GAME CALL");
                 bytes[0] = 3;
                 bytes[1] = CodeManager.NewGameResponse;
 
@@ -111,10 +111,10 @@ public class BTManager {
                 String debugMessage = "";
                 for (int i = 0; i < nBytes; i++)
                     debugMessage += (Integer.toString((int)data [i]) + " ");
-                Log.d("sending: ", debugMessage);
+                //Log.d("sending: ", debugMessage);
             }
             catch (IOException e) {
-                Log.d("BTRECEIVEDAT", e.getMessage());
+                //Log.d("B TRECEIVEDAT", e.getMessage());
                 return;
             }
         }
@@ -126,10 +126,12 @@ public class BTManager {
         }
         else if (code == CodeManager.TankClientPosition) {
             try {
-                Log.d("sth", "setting tank positions");
                 Serializer.deserializeMessage(shorts, (int) data[0], data);
-                TankManager.get(CodeManager.ClientTankIndex).worldLocation.set((float)shorts [1],
-                                                                               (float)shorts [2]);
+                /*Log.d("sth", "setting tank positionsL " + Float.toString((float) shorts[2]) + " " +
+                        Float.toString((float) shorts[3]));*/
+                TankManager.tanks [CodeManager.ClientTankIndex]
+                            .worldLocation.set((shorts [2] / ClientManager.factor),
+                                               (shorts [3] / ClientManager.factor));
             }
             catch (Exception e) {
                 Log.d("BTMANAGER", "deserialization failed");

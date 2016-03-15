@@ -54,7 +54,7 @@ public class ManageConnectThread extends Thread {
     }
 
     public void sendData(byte[] data) throws IOException {
-        Log.d("MANAGE CONNECT", "senData called");
+        //Log.d("MANAGE CONNECT", "senData called");
         outputStream.write(data);
         outputStream.flush();
     }
