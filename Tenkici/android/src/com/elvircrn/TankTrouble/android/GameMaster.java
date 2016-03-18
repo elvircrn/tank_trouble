@@ -31,9 +31,9 @@ public class GameMaster {
         Bullets [ ]
      */
 
-    public enum Mode { SERVER, CLIENT }
+    public enum Mode { LOCAL, SERVER, CLIENT }
 
-    private static Mode mode;
+    private static Mode mode = Mode.LOCAL;
 
     public static int playerCount = 2;
     public static float globalRatio;
@@ -82,45 +82,45 @@ public class GameMaster {
                 0.18f * Graphics.prefferedWidth,
                 0.18f * Graphics.prefferedHeight,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth);
+                0.10f * Graphics.prefferedWidth * Graphics.heightRatio());
 
         JoystickManager.get(1).button = new Button(1,
                 0.82f * Graphics.prefferedWidth,
                 0.82f * Graphics.prefferedHeight,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth);
+                0.10f * Graphics.prefferedWidth * Graphics.heightRatio());
 
         JoystickManager.get(0).analog = new Analog(0.18f * Graphics.prefferedWidth,
                 0.82f * Graphics.prefferedHeight,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth * Graphics.heightRatio(),
                 0.05f * Graphics.prefferedWidth);
 
         JoystickManager.get(1).analog = new Analog(0.82f * Graphics.prefferedWidth,
                 0.18f * Graphics.prefferedHeight,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth * Graphics.heightRatio(),
                 0.05f * Graphics.prefferedWidth);
 
         BTManager.serverButton = new Button(101,
                 Graphics.prefferedWidth / 2 - 10,
                 Graphics.prefferedHeight / 2 - 0.20f * Graphics.prefferedWidth,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth * Graphics.heightRatio(),
                 "server");
 
         BTManager.clientButton = new Button(102,
                 Graphics.prefferedWidth / 2 - 10,
                 Graphics.prefferedHeight / 2 + 0.20f * Graphics.prefferedWidth,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth * Graphics.heightRatio(),
                 "client");
 
         BTManager.syncButton = new Button(103,
                 Graphics.prefferedWidth / 2,
                 Graphics.prefferedHeight / 2,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth,
+                0.10f * Graphics.prefferedWidth * Graphics.heightRatio(),
                 "sync");
 
         JoystickManager.get(0).setInputRegion(new Rectangle(0, 0, Graphics.prefferedWidth / 2, Graphics.prefferedHeight));
@@ -138,6 +138,30 @@ public class GameMaster {
         updateBluetooth(deltaTime);
     }
 
+    public static void requestNewRound() {
+        if (mode == Mode.CLIENT) {
+            try {
+                ByteArrayList message = new ByteArrayList(3);
+                BTManager.shorts [0] = (short)(Graphics.prefferedHeight * 10.0f);
+
+                Serializer.serializeMessage(message,
+                        CodeManager.RequestNewGame,
+                        (short)1,
+                        BTManager.shorts);
+
+                BTManager.sendData(message.getContents());
+
+                Log.d("SYNC PRESSED", "OK");
+            }
+            catch (IOException e) {
+                Log.d("SYNC PRESSED FAIL", e.getMessage());
+            }
+        }
+        else {
+            Log.d("FUCK", "WHAT THE FUCK");
+        }
+    }
+
     public static void updateBluetooth(float deltaTime) {
         ByteArrayList messageBuffer = new ByteArrayList();
 
@@ -151,19 +175,7 @@ public class GameMaster {
 
         if (BTManager.syncButton.justPressed()) {
             Log.d("-", "REGISTERED SYNC BUTTON PRESS");
-            if (mode == Mode.CLIENT) {
-                try {
-                    ByteArrayList message = new ByteArrayList(3);
-                    Serializer.serializeMessage(message, CodeManager.RequestNewGame);
-                    BTManager.sendData(message.getContents());
-                    Log.d("SYNC PRESSED", "OK");
-                } catch (IOException e) {
-                    Log.d("SYNC PRESSED FAIL", e.getMessage());
-                }
-
-            } else {
-                Log.d("FUCK", "WHAT THE FUCK");
-            }
+            requestNewRound();
         }
 
         if (mode == Mode.CLIENT) {
@@ -173,6 +185,28 @@ public class GameMaster {
             }
             catch (IOException e) {
                 Log.d("CLIENT", "failed to send tank data");
+            }
+        }
+
+        if (mode == Mode.SERVER) {
+            ServerManager.writeTankLocation(messageBuffer);
+            try {
+                BTManager.sendData(messageBuffer.getContents());
+            }
+            catch (IOException e) {
+                Log.d("SERVER", "failed to send tank data");
+            }
+
+            //TODO: CHECK
+            //messageBuffer = new ByteArrayList();
+            messageBuffer.clear();
+            ServerManager.writeBullets(messageBuffer);
+
+            try {
+                BTManager.sendData(messageBuffer.getContents());
+            }
+            catch (IOException e) {
+                Log.d("SERVER", "failed to send bullet data");
             }
         }
     }
@@ -205,8 +239,11 @@ public class GameMaster {
         //povecaj poene
         TankManager.get((index + 1) % 2).points++;
 
+        if (mode != Mode.LOCAL)
+            requestNewRound();
         //pocni novu rundu
-        initNewRound();
+        else
+            initNewRound();
     }
 
     public static void initNewRound() {

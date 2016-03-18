@@ -56,7 +56,7 @@ public class Tank {
         this.worldLocation.set(startLocation.x, startLocation.y);
         this.rotation = startRotation;
         this.width = tankWidth;
-        this.height = tankHeight;
+        this.height = tankHeight * Graphics.heightRatio();
         this.initCollisionCircle();
         this.moveDirection.set(0, 1);
 
@@ -76,7 +76,7 @@ public class Tank {
         this.worldLocation.set(startLocationX, startLocationY);
         this.rotation = startRotation;
         this.width = tankWidth;
-        this.height = tankHeight;
+        this.height = tankHeight * Graphics.heightRatio();
         this.initCollisionCircle();
         this.moveDirection.set(0, 1);
 
@@ -100,7 +100,7 @@ public class Tank {
 
     public void shoot() {
         if (this.currentAmmo > 0) {
-            float r = getCollisionCircle().radius + 5;
+            float r = getCollisionCircle().radius + 2;
             BulletManager.addBullet(worldLocation.x + moveDirection.x * r, worldLocation.y + moveDirection.y * r, moveDirection.x, moveDirection.y, index);
             this.currentAmmo--;
         }
@@ -163,18 +163,18 @@ public class Tank {
         
         batch.draw(texture,
                    collisionCircle.x - width / 2,
-                   collisionCircle.y - width / 2,
+                   collisionCircle.y - height / 2,
                    width / 2,
-                   width / 2,
+                   height / 2,
                    width,
-                   width,
+                   height,
                    1.0f,
                    1.0f,
                    rotation,
                    0,
                    0,
                    texture.getWidth(),
-                   texture.getHeight(),
+                   (int)(Graphics.heightRatio() * texture.getHeight()),
                    false,
                    false);
     }

@@ -179,6 +179,16 @@ public class ByteArrayList {
         return true;
     }
 
+    public boolean addFloat(float flt) {
+        int number = Float.floatToIntBits(flt);
+        add(Serializer.getByte0(number));
+        add(Serializer.getByte0(number));
+        add(Serializer.getByte0(number));
+        add(Serializer.getByte0(number));
+
+        return true;
+    }
+
     /**
      * Removes all of the elements from this list.
      */
@@ -235,6 +245,11 @@ public class ByteArrayList {
         }
         return (short)((mStorage [idx]<< 8) + (mStorage [idx + 1]&0xFF));
     }
+
+    public int getInt(int idx) {
+        return ((mStorage [idx] << 24) + (mStorage [idx + 1] << 16) + (mStorage [idx + 2] << 8) + (mStorage [idx + 3]));
+    }
+
     /**
      * Replaces the element at the specified position in this list with the specified element
      *

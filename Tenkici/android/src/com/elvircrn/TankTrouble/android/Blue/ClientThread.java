@@ -9,9 +9,6 @@ import com.elvircrn.TankTrouble.android.GameMaster;
 
 import java.io.IOException;
 
-/**
- * Created by User on 6.3.2016.
- */
 public class ClientThread extends Thread {
     private BluetoothSocket bluetoothSocket;
     private BluetoothDevice bluetoothDevice;
@@ -70,6 +67,9 @@ public class ClientThread extends Thread {
         };
 
         Log.d("CLEINT run", "Connection to server established");
+
+        if (BTManager.handshake != null)
+            BTManager.handshake.cancel();
 
         BTManager.handshake = new ManageConnectThread(bluetoothSocket);
         BTManager.handshake.start();

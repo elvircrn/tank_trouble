@@ -15,7 +15,7 @@ public class Level {
 
     public static final int HORIZONTAL = 0, VERTICAL = 1;
     public static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
-    public static int wallWidth = 4;
+    public static int wallWidth = 8;
 
     private static short currentSeed;
 
@@ -232,6 +232,7 @@ public class Level {
             if (wall.width > 2 * wallWidth || wall.height > 2 * wallWidth)
                 walls.add(wall);
 
+        Debug("ses");
         DebugWalls();
     }
 
@@ -277,21 +278,18 @@ public class Level {
     }
 
     public static void DebugWalls() {
+        Log.d("wallwidth: ", Integer.toString(wallWidth));
         for (Wall wall : walls) {
             Log.d("WALL: ", Integer.toString(wall.x) + " " + Integer.toString(wall.y) + " " + Integer.toString(wall.width) + " " + Integer.toString(wall.height));
         }
     }
 
     public static void Debug(String logTag) {
-        String debugString = "|\n\n\n";
+        Log.d("map pixel width: ", Integer.toString(getMapPixelWidth()));
+        Log.d("map pixel height: ", Integer.toString(getMapPixelHeight()));
 
-        for (int i = height - 1; i > -1; i--) {
-            for (int j = 0; j < width; j++) {
-                debugString += (Integer.toString(Tiles[j] [i].walls.mask) + " ");
-            }
-            debugString += "\n";
-        }
+        Log.d("tile dimens: ", Integer.toString(getTileDimens()));
 
-        Gdx.app.log(logTag, debugString);
+        Log.d("offset: ", Float.toString(offset.x) + " " + Float.toString(offset.y));
     }
 }

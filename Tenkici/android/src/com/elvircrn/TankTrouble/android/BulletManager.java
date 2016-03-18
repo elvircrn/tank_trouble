@@ -36,6 +36,13 @@ public class BulletManager {
         lethal = false;
     }
 
+
+    public static void addBullet(float x, float y) {
+        Bullet bullet = bulletPool.obtain();
+        bullet.init(x, y);
+        bullets.add(bullet);
+    }
+
     public static void addBullet(float x, float y, float dirX, float dirY, int owner) {
         Bullet bullet = bulletPool.obtain();
         bullet.init(x, y, dirX, dirY, owner);
@@ -43,14 +50,17 @@ public class BulletManager {
     }
 
     public static void update(float deltaTime) {
-        Bullet bullet;
-        int n = bullets.size;
-        for (int i = n - 1; i > -1; i--) {
-            bullet = bullets.get(i);
-            bullet.update(deltaTime);
-            if (!bullet.alive) {
-                bullets.removeIndex(i);
-                bulletPool.free(bullet);
+        if (GameMaster.getMode() == GameMaster.Mode.SERVER ||
+                GameMaster.getMode() == GameMaster.Mode.LOCAL) {
+            Bullet bullet;
+            int n = bullets.size;
+            for (int i = n - 1; i > -1; i--) {
+                bullet = bullets.get(i);
+                bullet.update(deltaTime);
+                if (!bullet.alive) {
+                    bullets.removeIndex(i);
+                    bulletPool.free(bullet);
+                }
             }
         }
     }

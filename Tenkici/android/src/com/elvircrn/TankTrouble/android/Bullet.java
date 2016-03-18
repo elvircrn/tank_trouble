@@ -7,9 +7,6 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
-/**
- * Created by elvircrn on 2/14/2015.
- */
 public class Bullet implements Poolable {
     //public static properties
     public static Texture texture;
@@ -71,6 +68,14 @@ public class Bullet implements Poolable {
         this.alive = true;
         this.tick = bulletDuration;
         this.owner = owner;
+    }
+
+    public void init(float x, float y) {
+        this.worldLocation.set(x, y);
+        this.direction.set(0.0f, 0.0f);
+        this.alive = true;
+        this.tick = bulletDuration;
+        this.owner = 0;
     }
 
     public void update(float deltaTime) {

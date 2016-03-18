@@ -1,13 +1,22 @@
 package com.elvircrn.TankTrouble.android;
 
 public class ClientManager {
-    public static float factor = 10.0f;
+    public static float locationFactor = 10.0f;
+    public static float rotationFactor = 100.0f;
     public static void writeTankLocation(ByteArrayList messageBuffer) {
 		Tank tank = TankManager.get(CodeManager.ClientTankIndex);
+
+        int floatBits = Float.floatToIntBits(tank.rotation);
+
+        short short0 = Serializer.getShort0(floatBits);
+        short short1 = Serializer.getShort1(floatBits);
+
         Serializer.serializeMessage(messageBuffer,
                                     CodeManager.TankClientPosition,
-                                    (short)2,
-                                    new short[] {(short)(tank.worldLocation.x * factor),
-                                                 (short)(tank.worldLocation.y * factor)});
+                                    (short)4,
+                                    new short[] {(short)(tank.worldLocation.x * locationFactor),
+                                                 (short)(tank.worldLocation.y * locationFactor),
+                                                 short0,
+                                                 short1});
     }
 }

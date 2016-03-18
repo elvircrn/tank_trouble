@@ -72,12 +72,12 @@ public class ClientActivity extends Activity {
                 if (BTManager.clientThread == null)
                     BTManager.clientThread = new ClientThread();
 
-                if (BTManager.clientThread.isAlive()) {
+                if (BTManager.clientThread.getState() != Thread.State.NEW) {
                     BTManager.clientThread.cancel();
                     BTManager.clientThread.init(remoteDevices.get(i));
                     BTManager.clientThread.start();
                 }
-                else {
+                else if (BTManager.clientThread.getState() == Thread.State.NEW){
                     BTManager.clientThread.init(remoteDevices.get(i));
                     BTManager.clientThread.start();
                 }

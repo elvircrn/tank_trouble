@@ -4,24 +4,29 @@ import android.bluetooth.BluetoothAdapter;
 import android.util.Log;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.elvircrn.TankTrouble.android.BulletManager;
 import com.elvircrn.TankTrouble.android.Button;
 import com.elvircrn.TankTrouble.android.ByteArrayList;
 import com.elvircrn.TankTrouble.android.ClientManager;
 import com.elvircrn.TankTrouble.android.CodeManager;
 import com.elvircrn.TankTrouble.android.GameMaster;
+import com.elvircrn.TankTrouble.android.Graphics;
 import com.elvircrn.TankTrouble.android.Input;
+import com.elvircrn.TankTrouble.android.OtherGraphics;
 import com.elvircrn.TankTrouble.android.Serializer;
 import com.elvircrn.TankTrouble.android.TankManager;
 
 import java.io.IOException;
 import java.util.UUID;
 
+//hej momci u plavom...
 public class BTManager {
     //region data stuff
     public static final int buffSize = 1024;
     public static ByteArrayList byteArray;
     public static byte[] bytes;
     public static short[] shorts;
+    public static float[] floats;
 
     public static ByteArrayList messageBuffer;
     //endregion
@@ -50,6 +55,8 @@ public class BTManager {
         serverThread = new ServerThread();
         bytes = new byte[buffSize];
         shorts = new short[buffSize];
+        floats = new float[buffSize];
+        byteArray = new ByteArrayList(buffSize);
     }
 
     public static void update() {
@@ -71,32 +78,44 @@ public class BTManager {
         for (int i = 0; i < nBytes; i++)
             debugMessage += (Integer.toString((int)data [i]) + " ");
         //Gdx.app.log("sending: ", debugMessage);
-        handshake.sendData(data);
+
+        if (handshake != null)
+            handshake.sendData(data);
     }
 
     public static void receiveData(int arg, byte[] data) throws IOException {
-        byte code, nBytes = data[0];
+        byte code = data [1], nBytes = data[0];
 
         //Log.d("recevie", "RECEIVE DATA CALLED");
 
-        try {
-            Serializer.deserializeMessage(shorts, nBytes, data);
-        //    Log.d("received: ", "code: " + Byte.toString(data[0]));
-            code = data[1];
+        if (data [1] != CodeManager.BulletLocations) {
+            try {
+                Serializer.deserializeMessage(shorts, nBytes, data);
+                //    Log.d("received: ", "code: " + Byte.toString(data[0]));
+            }
+            catch (Exception e) {
+                //  Log.d("RECEIVEDT: ", e.getMessage());
+                return;
+            }
         }
-        catch (Exception e) {
-          //  Log.d("RECEIVEDT: ", e.getMessage());
-            return;
+        else {
+            Log.d("ser: ", "deserializing bullets");
+            Serializer.deserializeMessage(floats, nBytes, data);
         }
 
         if (code == CodeManager.NewGameResponse) {
-            short seed = shorts[1];
+            short seed = shorts[2];
             //Log.d("RECEIVE", "NEW GAME RESPONSE " + Short.toString(seed));
             GameMaster.initNewRound(seed);
+            Log.d("GRAPHICS: ", "Other Height: " + Float.toString(OtherGraphics.prefferedHeight) + " " + " This Height: " + Float.toString(Graphics.prefferedHeight));
         }
         else if (code == CodeManager.RequestNewGame) {
             short seed = (short) (System.currentTimeMillis() / 1000);
             GameMaster.initNewRound(seed);
+
+            OtherGraphics.prefferedHeight = shorts [2] / 10.f;
+
+            Log.d("GRAPHICS: ", "Other Height: " + Float.toString (OtherGraphics.prefferedHeight) + " " + " This Height: " + Float.toString(Graphics.prefferedHeight));
 
             try {
               //  Log.d("PROCESSING", "REQUEST NEW GAME CALL");
@@ -126,15 +145,40 @@ public class BTManager {
         }
         else if (code == CodeManager.TankClientPosition) {
             try {
-                Serializer.deserializeMessage(shorts, (int) data[0], data);
                 /*Log.d("sth", "setting tank positionsL " + Float.toString((float) shorts[2]) + " " +
                         Float.toString((float) shorts[3]));*/
                 TankManager.tanks [CodeManager.ClientTankIndex]
-                            .worldLocation.set((shorts [2] / ClientManager.factor),
-                                               (shorts [3] / ClientManager.factor));
+                            .worldLocation.set((shorts [2] / ClientManager.locationFactor),
+                                               OtherGraphics.getY(shorts [3] / ClientManager.locationFactor));
+
+                TankManager.tanks [CodeManager.ClientTankIndex]
+                        .rotation = Float.intBitsToFloat(Serializer.getInt(shorts [4], shorts [5]));
             }
             catch (Exception e) {
                 Log.d("BTMANAGER", "deserialization failed");
+            }
+        }
+        else if (code == CodeManager.TankServerPosition) {
+            try {
+                /*Log.d("sth", "setting tank positionsL " + Float.toString((float) shorts[2]) + " " +
+                        Float.toString((float) shorts[3]));*/
+                TankManager.tanks [CodeManager.ServerTankIndex]
+                        .worldLocation.set((shorts [2] / ClientManager.locationFactor),
+                        OtherGraphics.getY(shorts [3] / ClientManager.locationFactor));
+
+                TankManager.tanks [CodeManager.ServerTankIndex].rotation =
+                        Float.intBitsToFloat(Serializer.getInt(shorts [4], shorts [5]));
+            }
+            catch (Exception e) {
+                Log.d("BTMANAGER", "deserialization failed");
+            }
+        }
+        else if (GameMaster.getMode() == GameMaster.Mode.CLIENT && code == CodeManager.BulletLocations) {
+            BulletManager.clearBullets();
+
+            for (int i = 1; i < (int)floats[0]; i += 2) {
+                Log.d("(x, y): ", Float.toString(floats [i]) + " " + Float.toString(floats [i + 1]));
+                BulletManager.addBullet(floats[i], floats[i + 1]);
             }
         }
         else {
