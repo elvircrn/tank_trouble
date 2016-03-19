@@ -12,7 +12,7 @@ public class Bullet implements Poolable {
     public static Texture texture;
     public static int width, height; //initialized from the manager
     public static float bulletDuration = 8.0f;
-    public static float bulletSpeed = 150.0f;
+    public static float bulletSpeed = 250.0f;
 
     public int owner;
 

@@ -220,7 +220,7 @@ public class GameMaster {
         BulletManager.draw(batch);
     }
 
-    public static void tankBulletCollision() {
+    public static synchronized void tankBulletCollision() {
         /*
         if (!BulletManager.isLethal())
             return;

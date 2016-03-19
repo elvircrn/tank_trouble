@@ -160,7 +160,7 @@ public class Level {
         return pixelToTile((int)loc.x, (int)loc.y);
     }
 
-    public static void Draw(SpriteBatch batch) {
+    public static synchronized void Draw(SpriteBatch batch) {
         for (Wall wall : walls) {
             batch.draw(wallTexture, wall.x, wall.y, wall.width, wall.height);
         }

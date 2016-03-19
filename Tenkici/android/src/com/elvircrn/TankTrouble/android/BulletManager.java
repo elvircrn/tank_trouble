@@ -13,6 +13,8 @@ public class BulletManager {
         }
     };
 
+    public static int refreshRate = 10, currentFrame = 0;
+
     protected static boolean lethal;
 
     public static void create(int width, int height) {
@@ -61,6 +63,11 @@ public class BulletManager {
                     bulletPool.free(bullet);
                 }
             }
+        }
+
+        if (GameMaster.getMode() == GameMaster.Mode.CLIENT && currentFrame == refreshRate) {
+            clearBullets();
+            currentFrame = 0;
         }
     }
 
