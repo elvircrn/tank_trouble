@@ -32,6 +32,10 @@ public class Serializer {
         return (int) ((short0 << 16) + (short1 & 0xFFFF));
     }
 
+    public static int getInt(byte byte0, byte byte1, byte byte2, byte byte3) {
+        return getInt(getShort(byte0, byte1), getShort(byte2, byte3));
+    }
+
     public static byte getByte0(int number) {
         return (byte)(number >> 24);
     }
@@ -49,7 +53,12 @@ public class Serializer {
     }
     //endregion
 
+    public static float getFloat(int number) {
+        return Float.intBitsToFloat(number);
+    }
+
     public static void serializeMessage(ByteArrayList byteArrayList, byte code, short n, short[] shorts) {
+        //TODO: izvidi ovo
         byteArrayList.clear();
 
         byteArrayList.add((byte) (1 + 2 * n));
@@ -58,6 +67,26 @@ public class Serializer {
         for (int i = 0; i < n; i++) {
             byteArrayList.add(getByte0(shorts[i]));
             byteArrayList.add(getByte1(shorts[i]));
+        }
+    }
+
+    public static void serializeMessage(ByteArrayList byteArrayList,
+                                        byte code,
+                                        float x,
+                                        float y,
+                                        float dirX,
+                                        float dirY) {
+        byteArrayList.add((byte)26);
+        byteArrayList.add(code);
+        byteArrayList.addFloat(x);
+        byteArrayList.addFloat(y);
+        byteArrayList.addFloat(dirX);
+        byteArrayList.addFloat(dirY);
+    }
+
+    public static void deserializeShot(float[] floats, byte[] data) {
+        for (int i = 2; i < 26; i += 4) {
+            floats [i / 4] = getFloat(getInt(data[i], data[i + 1], data[i + 2], data[i + 3]));
         }
     }
 
@@ -93,7 +122,7 @@ public class Serializer {
     }
 
     public static void serializeMessage(ByteArrayList byteArrayList, byte code, Array<Bullet> bullets) {
-        byteArrayList.add((byte)(8 * BulletManager.count() + 1));
+        byteArrayList.add((byte)(8 * BulletManager.count() + 2));
         byteArrayList.add(code);
 
         for (Bullet bullet : bullets) {
@@ -105,9 +134,8 @@ public class Serializer {
 
     public static void deserializeMessage(float[] floats, int n, byte[] bytes) {
         floats [0] = bytes [0] / 4;
-        for (int i = 2; i < n; i += 4) {
-            floats [i / 4 + 1] = Float.intBitsToFloat(getInt(getShort(bytes [i], bytes [i + 1]),
-                    getShort(bytes [i + 2], bytes [i + 3])));
+        for (int i = 2; i < bytes [0]; i += 4) {
+            floats [i / 4 + 1] = Float.intBitsToFloat(getInt(bytes [i], bytes [i + 1], bytes [i + 2], bytes [i + 3]));
         }
     }
 

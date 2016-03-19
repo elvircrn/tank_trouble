@@ -38,13 +38,26 @@ public class ServerActivity extends Activity {
                     dlgAlert.show();
                 }
 
+
+
                 if (!BTManager.serverThread.isAlive())
                     BTManager.serverThread.start();
+
+
+                /*if (BTManager.handshake != null && !BTManager.handshake.running)
+                    BTManager.serverThread.start();
+                else if (BTManager.handshake != null){
+                    BTManager.handshake.cancel();
+                    BTManager.handshake.start();
+                }*/
             }
         });
     }
 
     public void init() {
+        if (BTManager.handshake != null && BTManager.handshake.running) {
+            BTManager.handshake.cancel();
+        }
         initButton();
     }
 

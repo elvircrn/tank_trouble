@@ -181,10 +181,12 @@ public class ByteArrayList {
 
     public boolean addFloat(float flt) {
         int number = Float.floatToIntBits(flt);
+
+        //zali boze mladosti
         add(Serializer.getByte0(number));
-        add(Serializer.getByte0(number));
-        add(Serializer.getByte0(number));
-        add(Serializer.getByte0(number));
+        add(Serializer.getByte1(number));
+        add(Serializer.getByte2(number));
+        add(Serializer.getByte3(number));
 
         return true;
     }

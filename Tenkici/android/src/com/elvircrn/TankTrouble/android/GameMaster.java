@@ -136,6 +136,8 @@ public class GameMaster {
         BTManager.update();
         tankBulletCollision();
         updateBluetooth(deltaTime);
+
+
     }
 
     public static void requestNewRound() {
@@ -162,8 +164,8 @@ public class GameMaster {
         }
     }
 
-    public static void updateBluetooth(float deltaTime) {
-        ByteArrayList messageBuffer = new ByteArrayList();
+    public static synchronized void updateBluetooth(float deltaTime) {
+        BTManager.messageBuffer.clear();
 
         if (BTManager.serverButton.justPressed()) {
             AndroidLauncher.tenkici.myGameCallback.onStartActivityServer();
@@ -179,9 +181,9 @@ public class GameMaster {
         }
 
         if (mode == Mode.CLIENT) {
-            ClientManager.writeTankLocation(messageBuffer);
+            ClientManager.writeTankLocation(BTManager.messageBuffer);
             try {
-                BTManager.sendData(messageBuffer.getContents());
+                BTManager.sendData(BTManager.messageBuffer.getContents());
             }
             catch (IOException e) {
                 Log.d("CLIENT", "failed to send tank data");
@@ -189,21 +191,20 @@ public class GameMaster {
         }
 
         if (mode == Mode.SERVER) {
-            ServerManager.writeTankLocation(messageBuffer);
+            ServerManager.writeTankLocation(BTManager.messageBuffer);
             try {
-                BTManager.sendData(messageBuffer.getContents());
+                BTManager.sendData(BTManager.messageBuffer.getContents());
             }
             catch (IOException e) {
                 Log.d("SERVER", "failed to send tank data");
             }
 
             //TODO: CHECK
-            //messageBuffer = new ByteArrayList();
-            messageBuffer.clear();
-            ServerManager.writeBullets(messageBuffer);
+            BTManager.messageBuffer.clear();
+            ServerManager.writeBullets(BTManager.messageBuffer);
 
             try {
-                BTManager.sendData(messageBuffer.getContents());
+                BTManager.sendData(BTManager.messageBuffer.getContents());
             }
             catch (IOException e) {
                 Log.d("SERVER", "failed to send bullet data");
@@ -220,9 +221,10 @@ public class GameMaster {
     }
 
     public static void tankBulletCollision() {
+        /*
         if (!BulletManager.isLethal())
             return;
-
+*/
         for (int i = 0; i < BulletManager.count(); i++) {
             for (int j = 0; j < playerCount; j++) {
                 if (TankManager.get(j).getCollisionCircle().contains(BulletManager.get(i).getCollisionCircle())) {
@@ -241,7 +243,6 @@ public class GameMaster {
 
         if (mode != Mode.LOCAL)
             requestNewRound();
-        //pocni novu rundu
         else
             initNewRound();
     }

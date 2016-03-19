@@ -12,6 +12,8 @@ public class ManageConnectThread extends Thread {
     private InputStream inputStream;
     private OutputStream outputStream;
 
+    public volatile boolean running = false;
+
     public ManageConnectThread() {
 
     }
@@ -41,26 +43,34 @@ public class ManageConnectThread extends Thread {
 
         Log.d("MANAGECONNECT", "Establishing handshake");
 
+        running = true;
+
         while (true) {
             try {
                 bytes = inputStream.read(buffer);
                 BTManager.receiveData(bytes, buffer);
             }
             catch (IOException e) {
-                Log.d("MANAGECONNECT run", e.getMessage());
+                Log.d("MANAGECONNECT run exc: ", e.getMessage());
+                cancel();
+                break;
+            }
+
+            if (!running) {
+                cancel();
                 break;
             }
         }
     }
 
     public void sendData(byte[] data) throws IOException {
-        //Log.d("MANAGE CONNECT", "senData called");
         outputStream.write(data);
         outputStream.flush();
     }
 
     public void cancel() {
         try {
+            running = false;
             bluetoothSocket.close();
         }
         catch (IOException e) {

@@ -72,12 +72,16 @@ public class ClientActivity extends Activity {
                 if (BTManager.clientThread == null)
                     BTManager.clientThread = new ClientThread();
 
-                if (BTManager.clientThread.getState() != Thread.State.NEW) {
-                    BTManager.clientThread.cancel();
+                if (BTManager.clientThread.getState() == Thread.State.NEW) {
                     BTManager.clientThread.init(remoteDevices.get(i));
                     BTManager.clientThread.start();
                 }
-                else if (BTManager.clientThread.getState() == Thread.State.NEW){
+                else {
+                    BTManager.clientThread.cancel();
+                    BTManager.clientThread.interrupt();
+
+                    BTManager.clientThread = new ClientThread(remoteDevices.get(i));
+
                     BTManager.clientThread.init(remoteDevices.get(i));
                     BTManager.clientThread.start();
                 }
@@ -91,6 +95,9 @@ public class ClientActivity extends Activity {
         setContentView(R.layout.activity_client);
 
         Log.d("CLIENTACTIVITY", "onCreate called");
+
+        if (BTManager.handshake != null && BTManager.handshake.running)
+            BTManager.handshake.cancel();
 
         if (!isReceiverActive) {
             Log.d("CLIENT", "onCreate isReceiverActive = true");

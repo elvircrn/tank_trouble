@@ -23,7 +23,6 @@ import java.util.UUID;
 public class BTManager {
     //region data stuff
     public static final int buffSize = 1024;
-    public static ByteArrayList byteArray;
     public static byte[] bytes;
     public static short[] shorts;
     public static float[] floats;
@@ -56,7 +55,7 @@ public class BTManager {
         bytes = new byte[buffSize];
         shorts = new short[buffSize];
         floats = new float[buffSize];
-        byteArray = new ByteArrayList(buffSize);
+        messageBuffer = new ByteArrayList(buffSize);
     }
 
     public static void update() {
@@ -73,22 +72,19 @@ public class BTManager {
 
     public static void sendData(byte[] data) throws IOException {
         int nBytes = data [0];
-        String debugMessage = "";
-        //Log.d("sendData", "SEND DATA CALLED");
-        for (int i = 0; i < nBytes; i++)
-            debugMessage += (Integer.toString((int)data [i]) + " ");
-        //Gdx.app.log("sending: ", debugMessage);
-
         if (handshake != null)
             handshake.sendData(data);
     }
 
-    public static void receiveData(int arg, byte[] data) throws IOException {
+    public static synchronized void receiveData(int arg, byte[] data) throws IOException {
         byte code = data [1], nBytes = data[0];
 
         //Log.d("recevie", "RECEIVE DATA CALLED");
 
-        if (data [1] != CodeManager.BulletLocations) {
+        if (data [1] == CodeManager.ClientShotFired) {
+            Serializer.deserializeShot(floats, data);
+        }
+        else if (data [1] != CodeManager.BulletLocations) {
             try {
                 Serializer.deserializeMessage(shorts, nBytes, data);
                 //    Log.d("received: ", "code: " + Byte.toString(data[0]));
@@ -99,7 +95,6 @@ public class BTManager {
             }
         }
         else {
-            Log.d("ser: ", "deserializing bullets");
             Serializer.deserializeMessage(floats, nBytes, data);
         }
 
@@ -175,14 +170,17 @@ public class BTManager {
         }
         else if (GameMaster.getMode() == GameMaster.Mode.CLIENT && code == CodeManager.BulletLocations) {
             BulletManager.clearBullets();
-
             for (int i = 1; i < (int)floats[0]; i += 2) {
-                Log.d("(x, y): ", Float.toString(floats [i]) + " " + Float.toString(floats [i + 1]));
+                //Log.d("(x, y): ", Float.toString(floats [i]) + " " + Float.toString(floats [i + 1]));
                 BulletManager.addBullet(floats[i], floats[i + 1]);
             }
+        }
+        else if (code == CodeManager.ClientShotFired) {
+            BulletManager.addBullet(floats [0], floats [1], floats [2], floats [3], 1);
         }
         else {
             Log.d("INVALID CODE: ", "received: " + Byte.toString(code));
         }
     }
 }
+//http://pokit.org/get/?4aedfa4926e2ed8ed7802415c085f28a.jpg

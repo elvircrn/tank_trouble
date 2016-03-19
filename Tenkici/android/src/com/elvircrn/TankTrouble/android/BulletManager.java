@@ -52,10 +52,9 @@ public class BulletManager {
     public static void update(float deltaTime) {
         if (GameMaster.getMode() == GameMaster.Mode.SERVER ||
                 GameMaster.getMode() == GameMaster.Mode.LOCAL) {
-            Bullet bullet;
             int n = bullets.size;
             for (int i = n - 1; i > -1; i--) {
-                bullet = bullets.get(i);
+                Bullet bullet = bullets.get(i);
                 bullet.update(deltaTime);
                 if (!bullet.alive) {
                     bullets.removeIndex(i);
@@ -74,6 +73,13 @@ public class BulletManager {
     }
 
     public static void clearBullets() {
+        //bullets.clear();
+        int n = bullets.size - 1;
+        for (int i = n - 1; i > -1; i--) {
+            Bullet bullet = bullets.get(i);
+            bullets.removeIndex(i);
+            bulletPool.free(bullet);
+        }
         for (int i = 0; i < bullets.size; i++)
             bullets.get(i).alive = false;
     }

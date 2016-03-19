@@ -3,6 +3,7 @@ package com.elvircrn.TankTrouble.android;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.elvircrn.TankTrouble.android.Blue.ClientActivity;
@@ -41,6 +42,9 @@ public class AndroidLauncher extends AndroidApplication implements Tenkici.MyGam
 	@Override
 	protected void onPause() {
 		super.onPause();
+
+		//Fix race condition imposed by AndroidGraphics
+		Gdx.graphics.requestRendering();
 	}
 
 	@Override

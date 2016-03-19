@@ -13,25 +13,19 @@ public class ClientThread extends Thread {
     private BluetoothSocket bluetoothSocket;
     private BluetoothDevice bluetoothDevice;
 
+    public volatile boolean running = false;
+
     public ClientThread () {
 
     }
 
     public ClientThread (BluetoothDevice bluetoothDevice) {
-        BluetoothSocket tmp = null;
-        this.bluetoothDevice = bluetoothDevice;
-
-        try {
-            tmp = this.bluetoothDevice.createRfcommSocketToServiceRecord(BTManager.myUUID);
-        }
-        catch (IOException e) {
-            Log.d("CONNECTTHREAD constr", e.getMessage());
-        }
-        this.bluetoothSocket = tmp;
+        init(bluetoothDevice);
     }
 
     public void init (BluetoothDevice bluetoothDevice) {
-        BluetoothSocket tmp = null;
+        BluetoothSocket tmp;
+        running = false;
         this.bluetoothDevice = bluetoothDevice;
 
         try {
@@ -48,6 +42,7 @@ public class ClientThread extends Thread {
 
     @Override
     public void run() {
+        running = true;
         BTManager.bluetoothAdapter.cancelDiscovery();
 
         try {
@@ -61,10 +56,13 @@ public class ClientThread extends Thread {
             }
             catch(IOException closeException) {
                 Log.d("CONNECTTHREAD run", closeException.toString());
+                running = false;
                 return;
             }
+
+            running = false;
             return;
-        };
+        }
 
         Log.d("CLEINT run", "Connection to server established");
 
@@ -75,15 +73,16 @@ public class ClientThread extends Thread {
         BTManager.handshake.start();
 
         FPSCounter.extraMessage = "HANDSHAKE";
+
+        running = false;
+
+        Log.d("ClientThread: ", "finished");
     }
 
     public boolean cancel() {
-        try {
-            bluetoothSocket.close();
-        } catch(IOException e) {
-            Log.d("CONNECTTHREAD cancel", e.toString());
-            return false;
-        }
+        running = false;
+        if (BTManager.handshake != null)
+            BTManager.handshake.cancel();
         return true;
     }
 }

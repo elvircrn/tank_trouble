@@ -33,6 +33,7 @@ public class FPSCounter {
     }
 
     public static void draw(SpriteBatch batch) {
+        //Tenkici.font16.draw(batch, extraMessage, location.x, location.y);
         /*String text = Integer.toString(frameDisplay) + " " + extraMessage + "\n"
                 + "RED: " + Float.toString(TankManager.tanks [0].worldLocation.x) + " "
                 + Float.toString(TankManager.tanks [0].worldLocation.y) + "   BLUE: " +

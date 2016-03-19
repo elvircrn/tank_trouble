@@ -11,6 +11,7 @@ public class CodeManager {
     public static final byte FramerServer       = 5;
     public static final byte TankClientPosition = 6;
     public static final byte TankServerPosition = 7;
-    public static final byte ShotFired          = 8;
-    public static final byte BulletLocations    = 9;
+    public static final byte BulletLocations    = 8;
+    public static final byte ClientShotFired    = 9;
+    public static final byte ServerShotFired    = 10;
 }

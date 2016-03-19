@@ -1,11 +1,16 @@
 package com.elvircrn.TankTrouble.android;
 
+import android.util.Log;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.elvircrn.TankTrouble.android.Blue.BTManager;
+
+import java.io.IOException;
 
 public class Tank {
     //static properties
@@ -99,10 +104,27 @@ public class Tank {
     }
 
     public void shoot() {
-        if (this.currentAmmo > 0) {
-            float r = getCollisionCircle().radius + 2;
-            BulletManager.addBullet(worldLocation.x + moveDirection.x * r, worldLocation.y + moveDirection.y * r, moveDirection.x, moveDirection.y, index);
-            this.currentAmmo--;
+        if (GameMaster.getMode() == GameMaster.Mode.LOCAL || GameMaster.getMode() == GameMaster.Mode.SERVER) {
+            if (this.currentAmmo > 0) {
+                float r = getCollisionCircle().radius + 2;
+                BulletManager.addBullet(worldLocation.x + moveDirection.x * r, worldLocation.y + moveDirection.y * r, moveDirection.x, moveDirection.y, index);
+                this.currentAmmo--;
+            }
+        }
+        else if (GameMaster.getMode() == GameMaster.Mode.CLIENT) {
+            if (this.currentAmmo > 0) {
+                float r = getCollisionCircle().radius + 2;
+                BTManager.messageBuffer.clear();
+                ClientManager.shoot(BTManager.messageBuffer, worldLocation.x + moveDirection.x * r, worldLocation.y + moveDirection.y * r, moveDirection.x, moveDirection.y);
+                this.currentAmmo--;
+
+                try {
+                    BTManager.sendData(BTManager.messageBuffer.getContents());
+                }
+                catch (IOException e) {
+                    Log.d("TANK SHOOT: ", "failed to send client shot data");
+                }
+            }
         }
     }
 
