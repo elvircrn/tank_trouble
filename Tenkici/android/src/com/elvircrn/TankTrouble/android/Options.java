@@ -109,10 +109,10 @@ public class Options {
         vibrateUp.update(Input.touchList);
         back.update(Input.touchList);
         plusWidth.update(Input.touchList);
-        plusHp.update(Input.touchList);
+        //plusHp.update(Input.touchList);
         plusHeight.update(Input.touchList);
         plusRound.update(Input.touchList);
-        minusHp.update(Input.touchList);
+        //minusHp.update(Input.touchList);
         minusHeight.update(Input.touchList);
         minusWidth.update(Input.touchList);
         minusRound.update(Input.touchList);

@@ -16,13 +16,30 @@ public class JoystickManager {
     }
 
     public static void update(float deltaTime) {
-        for (int i = 0; i < GameMaster.playerCount; i++) {
-            joysticks[i].update(deltaTime);
+        if (GameMaster.getMode() == GameMaster.Mode.CLIENT) {
+            joysticks [1].update(deltaTime);
+        }
+        else if (GameMaster.getMode() == GameMaster.Mode.SERVER) {
+            joysticks [0].update(deltaTime);
+        }
+        else {
+            for (int i = 0; i < GameMaster.playerCount; i++) {
+                joysticks[i].update(deltaTime);
+            }
         }
     }
 
     public static void draw(SpriteBatch batch) {
-        for (int i = 0; i < GameMaster.playerCount; i++)
-            joysticks [i].draw(batch);
+        if (GameMaster.getMode() == GameMaster.Mode.CLIENT) {
+            joysticks [1].draw(batch);
+        }
+        else if (GameMaster.getMode() == GameMaster.Mode.SERVER) {
+            joysticks [0].draw(batch);
+        }
+        else {
+            for (int i = 0; i < GameMaster.playerCount; i++) {
+                joysticks[i].draw(batch);
+            }
+        }
     }
 }

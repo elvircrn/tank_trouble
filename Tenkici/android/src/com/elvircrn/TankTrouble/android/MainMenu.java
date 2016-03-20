@@ -35,6 +35,8 @@ public class MainMenu {
     Texture background;
     Texture naslov;
 
+    Button singleplayerUp;
+    Button singleplayerDown;
     Button multiplayerUp;
     Button multiplayerDown;
     Button optionsUp;
@@ -65,6 +67,8 @@ public class MainMenu {
         multiplayerUp = new Button(203,true, koordx + new_height/2f, koordy-new_width-90 + new_width/2f, new_height, new_width,15);
         multiplayerDown = new Button(204,true, koordx + new_height/2f, koordy-new_width-90 + new_width/2f, new_height, new_width,16);
 
+        singleplayerUp= new Button(201,true, koordx + new_height/2f, koordy-70 + new_width/2f, new_height, new_width,13);
+        singleplayerDown= new Button(202,true, koordx + new_height/2f, koordy-70 + new_width/2f, new_height, new_width,14);
 
         optionsUp = new Button(205,true, margin + bSize/2f,margin + bSize/2f,bSize,bSize,17);
         optionsDown = new Button(206,true, margin + bSize/2f,margin + bSize/2f,bSize,bSize,18);
@@ -77,6 +81,7 @@ public class MainMenu {
     }
 
     public void update(float deltaTime){
+        singleplayerUp.update(Input.touchList);
         multiplayerDown.update(Input.touchList);
         multiplayerUp.update(Input.touchList);
         optionsDown.update(Input.touchList);
@@ -88,6 +93,13 @@ public class MainMenu {
         if(optionsDown.justRaised() && Input.count() == 0){
             StateManager.changeState(StateManager.State.OPTIONS);
         }
+        //
+        if(singleplayerUp.isDown() && !singleplayerUp.justPressed()){
+            bool_singleplayer=true;
+        }
+        /*if(singleplayerDown.justRaised() && Input.count() == 0){
+            StateManager.changeState(StateManager.State.SINGLEPLAYER);
+        }*/
         //
         if(multiplayerUp.isDown() && !multiplayerUp.justPressed()){
             bool_multiplayer=true;
@@ -102,6 +114,7 @@ public class MainMenu {
 
         batch.draw(background, 0, 0, screenW, screenH);
         batch.draw(naslov, screenW/2 - naslov_width/2, screenH/3+ naslov_height/4, naslov_width, naslov_height);
+        singleplayerUp.draw(batch);
         multiplayerUp.draw(batch);
         optionsUp.draw(batch);
 
@@ -113,7 +126,10 @@ public class MainMenu {
             multiplayerDown.draw(batch);
             bool_multiplayer = false;
         }
-
+        if(bool_singleplayer) {
+            singleplayerDown.draw(batch);
+            bool_singleplayer = false;
+        }
     }
 
 
