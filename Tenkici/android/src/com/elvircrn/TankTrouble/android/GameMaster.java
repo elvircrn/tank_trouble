@@ -3,6 +3,7 @@ package com.elvircrn.TankTrouble.android;
 import android.util.Log;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -46,6 +47,19 @@ public class GameMaster {
         GameMaster.mode = mode;
     }
 
+    public static Sound explode_effect;
+    public static boolean play_explode=true;
+
+    public static float points_red;
+    public static float points_blue;
+
+    public static int max_points=5;
+    public static boolean blue_winner=false;
+
+    public static int hp=1;
+
+    public static boolean vibrate=false;
+
     public static void createGame() {
         //initialize all static variables
         Level.create();
@@ -60,6 +74,7 @@ public class GameMaster {
         initTanks();
 
         BulletManager.makeLethal();
+        explode_effect = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/TankExplode.mp3"));
     }
 
     private static void initTanks() {
@@ -79,27 +94,27 @@ public class GameMaster {
         LevelManager.initLevel();
 
         JoystickManager.get(0).button = new Button(0,
-                0.18f * Graphics.prefferedWidth,
+                0.11f * Graphics.prefferedWidth,
                 0.18f * Graphics.prefferedHeight,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth * Graphics.heightRatio());
+                0.10f * Graphics.prefferedWidth);
 
         JoystickManager.get(1).button = new Button(1,
-                0.82f * Graphics.prefferedWidth,
+                0.89f * Graphics.prefferedWidth,
                 0.82f * Graphics.prefferedHeight,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth * Graphics.heightRatio());
+                0.10f * Graphics.prefferedWidth);
 
-        JoystickManager.get(0).analog = new Analog(0.18f * Graphics.prefferedWidth,
+        JoystickManager.get(0).analog = new Analog(0.11f * Graphics.prefferedWidth,
                 0.82f * Graphics.prefferedHeight,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth * Graphics.heightRatio(),
+                0.10f * Graphics.prefferedWidth,
                 0.05f * Graphics.prefferedWidth);
 
-        JoystickManager.get(1).analog = new Analog(0.82f * Graphics.prefferedWidth,
+        JoystickManager.get(1).analog = new Analog(0.89f * Graphics.prefferedWidth,
                 0.18f * Graphics.prefferedHeight,
                 0.10f * Graphics.prefferedWidth,
-                0.10f * Graphics.prefferedWidth * Graphics.heightRatio(),
+                0.10f * Graphics.prefferedWidth,
                 0.05f * Graphics.prefferedWidth);
 
         BTManager.serverButton = new Button(101,
@@ -129,7 +144,6 @@ public class GameMaster {
 
     public static void update(float deltaTime) {
         FPSCounter.update(deltaTime);
-        Input.update();
         JoystickManager.update(deltaTime);
         TankManager.update(deltaTime);
         BulletManager.update(deltaTime);
@@ -137,6 +151,12 @@ public class GameMaster {
         tankBulletCollision();
         updateBluetooth(deltaTime);
 
+
+        if(mode == Mode.LOCAL && (GameMaster.points_red == GameMaster.max_points || GameMaster.points_blue == GameMaster.max_points)) {
+            StateManager.changeState(StateManager.State.VICTORY_SCREEN);
+            if(GameMaster.points_blue == GameMaster.max_points) {TankManager.get(1).points = 0; TankManager.get(0).points=0;}
+            if(GameMaster.points_red == GameMaster.max_points) {TankManager.get(0).points = 0; TankManager.get(1).points=0;}
+        }
 
     }
 
@@ -166,19 +186,6 @@ public class GameMaster {
 
     public static synchronized void updateBluetooth(float deltaTime) {
         BTManager.messageBuffer.clear();
-
-        if (BTManager.serverButton.justPressed()) {
-            AndroidLauncher.tenkici.myGameCallback.onStartActivityServer();
-        }
-
-        if (BTManager.clientButton.justPressed()) {
-            AndroidLauncher.tenkici.myGameCallback.onStartActivityClient();
-        }
-
-        if (BTManager.syncButton.justPressed()) {
-            Log.d("-", "REGISTERED SYNC BUTTON PRESS");
-            requestNewRound();
-        }
 
         if (mode == Mode.CLIENT) {
             ClientManager.writeTankLocation(BTManager.messageBuffer);
@@ -225,9 +232,9 @@ public class GameMaster {
         if (!BulletManager.isLethal())
             return;
 */
-        for (int i = 0; i < BulletManager.count(); i++) {
+        for (Bullet bullet : BulletManager.bullets) {
             for (int j = 0; j < playerCount; j++) {
-                if (TankManager.get(j).getCollisionCircle().contains(BulletManager.get(i).getCollisionCircle())) {
+                if (TankManager.get(j).getCollisionCircle().contains(bullet.getCollisionCircle())) {
                     Gdx.app.log("points", "one: " + Integer.toString(TankManager.get(0).points) + " two: " + Integer.toString(TankManager.get(1).points));
                     onTankHit(j);
                 }
@@ -236,10 +243,29 @@ public class GameMaster {
     }
 
     public static void onTankHit(int index) {
-        //ovdje moze ici kod za eksplozije
+        if (mode == Mode.LOCAL) {
+            float xPos = TankManager.get(index).worldLocation.x;
+            float yPos = TankManager.get(index).worldLocation.y;
 
-        //povecaj poene
-        TankManager.get((index + 1) % 2).points++;
+            if (index == 0) {
+                Tenkici.explosion_effect_red.setPosition(xPos, yPos);
+                Tenkici.explosion_effect_red.start();
+                points_blue = TankManager.get(1).points++;
+            } else if (index == 1) {
+                Tenkici.explosion_effect_blue.setPosition(xPos, yPos);
+                Tenkici.explosion_effect_blue.start();
+                points_red = TankManager.get(0).points++;
+            }
+
+            TankManager.get(index).drawable = false;
+
+            if (play_explode) {
+                explode_effect.play(Options.SOUND_VOLUME);
+            }
+            if(vibrate == true){
+                Gdx.input.vibrate(300);
+            }
+        }
 
         if (mode != Mode.LOCAL)
             requestNewRound();
@@ -248,14 +274,36 @@ public class GameMaster {
     }
 
     public static void initNewRound() {
-        BulletManager.clearBullets();
-        LevelManager.initLevel();
-        Vector2 tankOne = Level.tileToScreen(0, 0);
-        Vector2 tankTwo = Level.tileToScreen(Level.width - 1, Level.height - 1);
+        if (mode == Mode.LOCAL) {
+            if(points_blue==max_points-1){
+                blue_winner = true;
+            }
+            else if(points_red==max_points-1){
+                blue_winner = false;
+            }
+            else {
 
-        float tankDimens = (2.0f * Level.getTileDimens()) / 5.0f;
-        TankManager.get(0).spawnTo(tankOne.x + Level.getTileDimens() / 2, tankOne.y + Level.getTileDimens() / 2, JoystickManager.get(0).analog.getNorAngle(), tankDimens, tankDimens);
-        TankManager.get(1).spawnTo(tankTwo.x + Level.getTileDimens() / 2, tankTwo.y + Level.getTileDimens() / 2, JoystickManager.get(1).analog.getNorAngle(), tankDimens, tankDimens);
+                com.elvircrn.TankTrouble.android.BulletManager.clearBullets();
+                com.elvircrn.TankTrouble.android.LevelManager.initLevel();
+                Vector2 tankOne = com.elvircrn.TankTrouble.android.Level.tileToScreen(0, 0);
+                Vector2 tankTwo = com.elvircrn.TankTrouble.android.Level.tileToScreen(com.elvircrn.TankTrouble.android.Level.width - 1, com.elvircrn.TankTrouble.android.Level.height - 1);
+
+                float tankDimens = (2.0f * com.elvircrn.TankTrouble.android.Level.getTileDimens()) / 5.0f;
+                TankManager.get(0).spawnTo(tankOne.x + com.elvircrn.TankTrouble.android.Level.getTileDimens() / 2, tankOne.y + com.elvircrn.TankTrouble.android.Level.getTileDimens() / 2, Tank.defaultRotation, tankDimens, tankDimens);
+                TankManager.get(1).spawnTo(tankTwo.x + com.elvircrn.TankTrouble.android.Level.getTileDimens() / 2, tankTwo.y + com.elvircrn.TankTrouble.android.Level.getTileDimens() / 2, Tank.defaultRotation, tankDimens, tankDimens);
+            }
+        }
+        else {
+            BulletManager.clearBullets();
+            LevelManager.initLevel();
+            Vector2 tankOne = Level.tileToScreen(0, 0);
+            Vector2 tankTwo = Level.tileToScreen(Level.width - 1, Level.height - 1);
+
+            float tankDimens = (2.0f * Level.getTileDimens()) / 5.0f;
+            TankManager.get(0).spawnTo(tankOne.x + Level.getTileDimens() / 2, tankOne.y + Level.getTileDimens() / 2, JoystickManager.get(0).analog.getNorAngle(), tankDimens, tankDimens);
+            TankManager.get(1).spawnTo(tankTwo.x + Level.getTileDimens() / 2, tankTwo.y + Level.getTileDimens() / 2, JoystickManager.get(1).analog.getNorAngle(), tankDimens, tankDimens);
+
+        }
     }
 
     public static void initNewRound(short seed) {

@@ -2,6 +2,8 @@ package com.elvircrn.TankTrouble.android;
 
 import android.util.Log;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
@@ -17,6 +19,7 @@ public class Tank {
     public static float tankSpeed = 100.0f;
     public static int defaultMaxAmmo = 3;
     public static float defaultReloadTime = 2.0f;
+    public static  float defaultRotation = -1.57079632f;
 
     //Textures
     public Texture texture;
@@ -43,12 +46,20 @@ public class Tank {
     //Boring flags
     public boolean drawable;
 
+    //SoundEffect
+    public static Sound shot_effect;
+    public static boolean play_shot;
+
+    //r declaration
+    float r;
+
     //Constructors
     public Tank() {
         collision = new Rectangle();
         moveDirection = new Vector2();
         collisionCircle = new Circle();
         worldLocation = new Vector2();
+        rotation = defaultRotation;
     }
 
     public Tank(int index, Vector2 startLocation, float startRotation, float tankWidth, float tankHeight) {
@@ -61,7 +72,7 @@ public class Tank {
         this.worldLocation.set(startLocation.x, startLocation.y);
         this.rotation = startRotation;
         this.width = tankWidth;
-        this.height = tankHeight * Graphics.heightRatio();
+        this.height = tankHeight;
         this.initCollisionCircle();
         this.moveDirection.set(0, 1);
 
@@ -71,6 +82,8 @@ public class Tank {
         this.maxAmmo = Tank.defaultMaxAmmo;
 
         this.drawable = true;
+
+        shot_effect = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/TankShot.mp3"));
     }
 
     public void setTexture(Texture texture) {
@@ -109,6 +122,17 @@ public class Tank {
                 float r = getCollisionCircle().radius + 2;
                 BulletManager.addBullet(worldLocation.x + moveDirection.x * r, worldLocation.y + moveDirection.y * r, moveDirection.x, moveDirection.y, index);
                 this.currentAmmo--;
+                if(play_shot==true) {
+                    shot_effect.play(Options.SOUND_VOLUME);
+                }
+                float posr = r;
+                float negr = -r;
+
+                float posX = worldLocation.x + moveDirection.x * (posr-10);
+                float posY = worldLocation.y + moveDirection.y * (posr-10);
+
+                Tenkici.smoke_effect.setPosition(posX, posY);
+                Tenkici.smoke_effect.start();
             }
         }
         else if (GameMaster.getMode() == GameMaster.Mode.CLIENT) {

@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 public class Input {
     private static int touchCount;
     public static Vector2[] touchList;
+    protected static boolean prevPressed = false;
 
     public static void create() {
         touchList = new Vector2[7];
@@ -22,6 +23,11 @@ public class Input {
     }
 
     public static void update() {
+        if (touchCount > 0)
+            prevPressed = true;
+        else
+            prevPressed = false;
+
         touchCount = 0;
 
         for (int i = 0; i < 7; i++) {
@@ -38,6 +44,10 @@ public class Input {
                 touchCount++;
             }
         }
+    }
+
+    public static boolean isPrevPressed() {
+        return prevPressed;
     }
 
     public static Vector2 get(int index) {

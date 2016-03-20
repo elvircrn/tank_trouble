@@ -4,7 +4,7 @@ package com.elvircrn.TankTrouble.android;
  * Created by elvircrn on 3/1/2016.
  */
 public class StateManager {
-    public enum State { MAINMENU, SINGLEPLAYER, MULTIPLAYER, OPTIONS }
+    public static enum State {BLUE, MAINMENU, SINGLEPLAYER, MULTIPLAYER, OPTIONS, VICTORY_SCREEN, MP_MENU};
 
     private static boolean justChanged = false;
     private static State currentState, prevState;

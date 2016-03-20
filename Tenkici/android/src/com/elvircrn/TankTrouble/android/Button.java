@@ -12,12 +12,14 @@ public class Button {
     //static values
     public static Texture texture;
 
+    public boolean menuButton;
+
     //instance properties
     public Vector2 screenLocation; //set at center
     public float width, height;
     private Rectangle screenRectangle;
     public SimpleText text = null;
-
+    public int textureIndex;
     public int index;
 
     //event properties
@@ -25,11 +27,15 @@ public class Button {
 
     //constructors
     public Button() {
+        menuButton = false;
+        textureIndex = -1;
         screenLocation = new Vector2();
         screenRectangle = new Rectangle();
     }
 
     public Button(int index, float locX, float locY, float width, float height) {
+        menuButton = false;
+        textureIndex = -1;
         screenRectangle = new Rectangle();
         this.index = index;
         screenLocation = new Vector2(locX, locY);
@@ -61,19 +67,19 @@ public class Button {
         this.text = new SimpleText (screenLocation, text);
     }
 
-
-    //instance methods
-    public void init(int index, float locX, float locY, float width, float height, SimpleText text) {
-        this.text = text;
+    public Button(int index, boolean isMenu, float locX, float locY, float width, float height, int textureIndex) {
+        this.menuButton = isMenu;
+        this.textureIndex = textureIndex;
+        screenRectangle = new Rectangle();
         this.index = index;
-        screenLocation.set(locX, locY);
+        screenLocation = new Vector2(locX, locY);
         this.width = width;
         this.height = height;
         buttonPressed = false;
         prevButtonPressed = false;
-        text.set(text.getLocation(), text.getText());
     }
 
+    //instance methods
     public void init(int index, float locX, float locY, float width, float height) {
         this.index = index;
         screenLocation.set(locX, locY);
@@ -81,6 +87,7 @@ public class Button {
         this.height = height;
         buttonPressed = false;
         prevButtonPressed = false;
+        text.set(text.getLocation(), text.getText());
     }
 
     public void init(int index, float locX, float locY, float width, float height, Vector2 location, String text) {
@@ -94,7 +101,7 @@ public class Button {
     }
 
     public void setTexture(Texture texture) {
-        this.texture = texture;
+        Button.texture = texture;
     }
 
     public Rectangle getScreenRectangle() {
@@ -111,30 +118,39 @@ public class Button {
     public boolean update(Vector2[] locations) {
         prevButtonPressed = buttonPressed;
         buttonPressed = false;
-        for (Vector2 loc : locations)
-            buttonPressed |= getScreenRectangle().contains(loc);
+        for (int i = 0; i < Input.count(); i++)
+            buttonPressed |= getScreenRectangle().contains(Input.get(i));
 
         return buttonPressed;
     }
 
-    public void draw(SpriteBatch batch) {
-        batch.draw(texture, screenLocation.x - width / 2, screenLocation.y - height / 2, width, height);
 
-        if (text != null)
-            text.draw(batch);
+    public void draw(SpriteBatch batch) {
+        if (textureIndex == -1)
+            batch.draw(texture, screenLocation.x - width / 2, screenLocation.y - height / 2, width, height);
+        else
+            batch.draw(ButtonManager.textures[textureIndex], screenLocation.x - width / 2, screenLocation.y - height / 2, width, height);
     }
 
     public boolean fingerOnButton(int index) {
-        Vector2 location = Input.get(index);
+        Vector2 location = com.elvircrn.TankTrouble.android.Input.get(index);
         return getScreenRectangle().contains(location);
     }
 
     //events
     public boolean justPressed() {
-        if (!prevButtonPressed && buttonPressed)
-            return true;
-        else
-            return false;
+        if (!menuButton) {
+            if (!prevButtonPressed && buttonPressed)
+                return true;
+            else
+                return false;
+        }
+        else {
+            if (!Input.isPrevPressed() && buttonPressed)
+                return true;
+            else
+                return false;
+        }
     }
 
     public boolean isDown() {

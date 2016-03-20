@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 
+import com.elvircrn.TankTrouble.android.GameMaster;
 import com.elvircrn.TankTrouble.android.R;
 
 public class ServerActivity extends Activity {
@@ -21,6 +22,7 @@ public class ServerActivity extends Activity {
             public void onClick(View view) {
                 try {
                     BTManager.serverThread.init();
+                    GameMaster.setMode(GameMaster.Mode.SERVER);
                 }
                 catch (Exception e) {
                     //Achievement get: Encounter builder pattern in the wild!

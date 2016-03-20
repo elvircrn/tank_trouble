@@ -26,12 +26,5 @@ public class ServerManager {
         Serializer.serializeMessage(messageBuffer,
                 CodeManager.BulletLocations,
                 BulletManager.bullets);
-
-        Serializer.deserializeMessage(floatDbg, (int) messageBuffer.getContents()[0], messageBuffer.getContents());
-
-        FPSCounter.extraMessage = "";
-
-        for (int i = 1; i < (int)floatDbg [0]; i++)
-            FPSCounter.extraMessage += Float.toString(floatDbg [i]) + " ";
     }
 }

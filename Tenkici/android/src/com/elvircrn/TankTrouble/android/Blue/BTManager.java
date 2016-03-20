@@ -3,6 +3,7 @@ package com.elvircrn.TankTrouble.android.Blue;
 import android.bluetooth.BluetoothAdapter;
 import android.util.Log;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.elvircrn.TankTrouble.android.BulletManager;
 import com.elvircrn.TankTrouble.android.Button;
@@ -11,7 +12,6 @@ import com.elvircrn.TankTrouble.android.ClientManager;
 import com.elvircrn.TankTrouble.android.CodeManager;
 import com.elvircrn.TankTrouble.android.GameMaster;
 import com.elvircrn.TankTrouble.android.Graphics;
-import com.elvircrn.TankTrouble.android.Input;
 import com.elvircrn.TankTrouble.android.OtherGraphics;
 import com.elvircrn.TankTrouble.android.Serializer;
 import com.elvircrn.TankTrouble.android.TankManager;
@@ -59,15 +59,9 @@ public class BTManager {
     }
 
     public static void update() {
-        serverButton.update(Input.touchList);
-        clientButton.update(Input.touchList);
-        syncButton.update(Input.touchList);
     }
 
     public static void draw(SpriteBatch batch) {
-        serverButton.draw(batch);
-        clientButton.draw(batch);
-        syncButton.draw(batch);
     }
 
     public static void sendData(byte[] data) throws IOException {
@@ -180,6 +174,7 @@ public class BTManager {
         }
         else {
             Log.d("INVALID CODE: ", "received: " + Byte.toString(code));
+            Gdx.app.log("a", "a");
         }
     }
 }

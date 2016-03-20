@@ -14,82 +14,60 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
 
 public class MainMenu {
 
     SpriteBatch batch;
-    Texture slikica_single;
-    Texture slikica_multi;
-
     private BitmapFont font;
 
     float screenW, screenH;
     float width = 128, height=1024;
-
-    Rectangle rect;
-
     float new_height;
     float new_width;
     float koordx, koordy;
-    float od_y=150;
-
-    SimpleButton button_singleplayer;
-    SimpleButton button_multiplayer;
-    Texture slikica_single_down_txt;
-    Texture slikica_multi_down_txt;
-    boolean slikica_single_down_show=false;
-    boolean slikica_multi_down_show=false;
-
+    //NW = 512 NH = 128
+    float naslov_height=256;
+    float naslov_width = 1024;
+    float margin;
+    float bSize;
+    Texture background;
     Texture naslov;
 
-    SimpleButton button_options;
-    Texture options_button_up_txt;
-    Texture options_button_down_txt;
-    boolean options_button_up_show = false;
-    boolean options_button_down_show = false;
-    float options_koordx;
-    float options_koordy;
-    float options_height;
-    float options_width;
+    Button multiplayerUp;
+    Button multiplayerDown;
+    Button optionsUp;
+    Button optionsDown;
+
+    ParticleEffect pEffect;
+
+    public boolean bool_singleplayer=false;
+    public boolean bool_multiplayer=false;
+    public boolean bool_options=false;
 
     public void create () {
-        batch = new SpriteBatch();
-	/*	img = new Texture("sp.jpg");
-		img2 = new Texture("mp.jpg");*/
+
+        background = new Texture("MainMenuData/background.png");
+        naslov = new Texture("MainMenuData/naslov.png");
         font = new BitmapFont();
         font.setColor(Color.WHITE);
 
         screenW = Graphics.prefferedWidth;
         screenH = Graphics.prefferedHeight;
+        margin=screenW*0.01f;
+        bSize = 9*(screenW/100);
         new_height = 70*(screenW/100);
         new_width = (width*new_height)/height;
         koordx=screenW/2 - new_height/2;
-        koordy=screenH-new_width - od_y;
+        koordy=screenH/2 - new_width/2;
 
-        slikica_single = new Texture("MainMenuData/spUp.png");
-        slikica_single_down_txt = new Texture("MainMenuData/spDn.png");
-        slikica_multi = new Texture("MainMenuData/mpUp.png");
-        slikica_multi_down_txt = new Texture("MainMenuData/mpDn.png");
+        multiplayerUp = new Button(203,true, koordx + new_height/2f, koordy-new_width-90 + new_width/2f, new_height, new_width,15);
+        multiplayerDown = new Button(204,true, koordx + new_height/2f, koordy-new_width-90 + new_width/2f, new_height, new_width,16);
 
-        button_singleplayer = new SimpleButton(slikica_single, koordx, koordy, new_height, new_width);
 
-        koordy = screenH-new_width-new_width-od_y-20;
-
-        button_multiplayer = new SimpleButton(slikica_multi, koordx, koordy, new_height, new_width);
-
-        naslov = new Texture("MainMenuData/naslov.png");
-
-        options_button_up_txt = new Texture("MainMenuData/gearUp.png");
-        options_button_down_txt = new Texture("MainMenuData/gearDn.png");
-
-        options_koordx = screenW-50;
-        options_koordy = 0;
-        options_width = 10*(screenW/100);
-        options_height = (50*options_width)/50;
-
-        button_options = new SimpleButton(options_button_up_txt, options_koordx, options_koordy, options_width, options_height);
+        optionsUp = new Button(205,true, margin + bSize/2f,margin + bSize/2f,bSize,bSize,17);
+        optionsDown = new Button(206,true, margin + bSize/2f,margin + bSize/2f,bSize,bSize,18);
 
         load();
     }
@@ -97,87 +75,45 @@ public class MainMenu {
     public void load(){
 
     }
-    float x_pressed;
-    float y_pressed;
+
     public void update(float deltaTime){
-        for (int i = 0; i < 7; i++) {
-            if (Gdx.input.isTouched(i)) {
-                float locX = (float)Gdx.input.getX(i);
-                float locY = (float)Gdx.input.getY(i);
+        multiplayerDown.update(Input.touchList);
+        multiplayerUp.update(Input.touchList);
+        optionsDown.update(Input.touchList);
+        optionsUp.update(Input.touchList);
 
-                x_pressed = locX;
-                y_pressed = screenH - locY;
-
-                if(button_singleplayer.checkIfClicked(x_pressed, y_pressed) == true){
-                    slikica_single_down_show=true;
-                }
-                else{
-                    slikica_single_down_show=false;
-                }
-
-                if(button_multiplayer.checkIfClicked(x_pressed, y_pressed) == true){
-                    slikica_multi_down_show=true;
-                }
-                else{
-                    slikica_multi_down_show=false;
-                }
-
-                if(button_options.checkIfClicked(x_pressed, y_pressed) == true){
-                    options_button_down_show = true;
-                }
-                else{
-                    options_button_down_show=false;
-                }
-
-            }
+        if(optionsUp.isDown() && !optionsUp.justPressed()){
+            bool_options=true;
         }
-
-    }
-
-    public boolean isMultiPlayer_Clicked(){
-        if(slikica_multi_down_show == true) return true;
-        else return false;
-    }
-
-    public boolean isSinglePlayer_Clicked(){
-        if(slikica_single_down_show == true) return true;
-        else return false;
-    }
-
-    public boolean isOptions_Clicked(){
-        if(options_button_down_show == true) return true;
-        else return false;
+        if(optionsDown.justRaised() && Input.count() == 0){
+            StateManager.changeState(StateManager.State.OPTIONS);
+        }
+        //
+        if(multiplayerUp.isDown() && !multiplayerUp.justPressed()){
+            bool_multiplayer=true;
+        }
+        if(multiplayerDown.justRaised() && Input.count() == 0){
+            StateManager.changeState(StateManager.State.MP_MENU);
+        }
     }
 
     public void render(SpriteBatch batch) {
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        update(deltaTime);
+        batch.draw(background, 0, 0, screenW, screenH);
+        batch.draw(naslov, screenW/2 - naslov_width/2, screenH/3+ naslov_height/4, naslov_width, naslov_height);
+        multiplayerUp.draw(batch);
+        optionsUp.draw(batch);
 
-        button_singleplayer.update(batch, x_pressed, y_pressed);
-        button_multiplayer.update(batch, x_pressed, y_pressed);
-
-        new_height = 70*(screenW/100);
-        new_width = (width*new_height)/height;
-
-        if(slikica_single_down_show==true){
-            batch.draw(slikica_single_down_txt, koordx, screenH-new_width - od_y, new_height, new_width);
+        if(bool_options) {
+            optionsDown.draw(batch);
+            bool_options = false;
+        }
+        if(bool_multiplayer) {
+            multiplayerDown.draw(batch);
+            bool_multiplayer = false;
         }
 
-        if(slikica_multi_down_show==true){
-            batch.draw(slikica_multi_down_txt, koordx, koordy, new_height, new_width);
-        }
-
-        new_height = 70*(screenW/100);
-        new_width = (naslov.getHeight() * new_height) / naslov.getWidth();
-
-        batch.draw(naslov, koordx, screenH - naslov.getHeight()+15, new_height, new_width);
-
-        button_options.update(batch, x_pressed, y_pressed);
-
-        if(options_button_down_show==true){
-            batch.draw(options_button_down_txt, options_koordx, options_koordy, options_width, options_height);
-        }
     }
 
 

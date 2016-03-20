@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.elvircrn.TankTrouble.android.GameMaster;
 import com.elvircrn.TankTrouble.android.R;
 
 import java.util.ArrayList;
@@ -75,6 +76,7 @@ public class ClientActivity extends Activity {
                 if (BTManager.clientThread.getState() == Thread.State.NEW) {
                     BTManager.clientThread.init(remoteDevices.get(i));
                     BTManager.clientThread.start();
+                    GameMaster.setMode(GameMaster.Mode.CLIENT);
                 }
                 else {
                     BTManager.clientThread.cancel();

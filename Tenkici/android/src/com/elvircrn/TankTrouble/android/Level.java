@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.SnapshotArray;
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;
@@ -28,13 +29,15 @@ public class Level {
     private static int[] dirX = new int[]{ 0, 1, 0, -1, 1, 1, -1, -1 };
     private static int[] dirY = new int[]{ 1, 0, -1, 0, 1, -1, 1, -1 };
 
-    public static ArrayList<Wall> walls;
+    public static volatile ArrayList<Wall> walls;
 
     private static Boolean[][] visited;
     private static int[][] priority;
 
     public static int height, width;
     public static Tile[][] Tiles;
+
+    public static SnapshotArray snap;
 
     private Level() { }
 
@@ -44,6 +47,7 @@ public class Level {
         visited   = new Boolean[10] [10];
         walls     = new ArrayList<>();
         ret       = new Rectangle();
+        snap      = new SnapshotArray();
     }
 
     public static void set_priorities(int width, int height) {
@@ -166,7 +170,7 @@ public class Level {
         }
     }
 
-    private static void generateWalls() {
+    private static synchronized void generateWalls() {
         //Vertical
         ArrayList<Wall> newWalls = new ArrayList<>();
         Vector2 beginning = new Vector2(), ending = new Vector2();

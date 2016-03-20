@@ -29,8 +29,7 @@ public class TankManager {
     public static void update(float deltaTime) {
         //for (int i = 0; i < 1; i++)
         if (GameMaster.getMode() == GameMaster.Mode.CLIENT) {
-            for (int i = 0; i < GameMaster.playerCount; i++)
-                tanks[i].update(deltaTime);
+            tanks[CodeManager.ClientTankIndex].update(deltaTime);
         }
         else if (GameMaster.getMode() == GameMaster.Mode.SERVER) {
             tanks[CodeManager.ServerTankIndex].update(deltaTime);

@@ -5,8 +5,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 public class BulletManager {
-    public static final Array<Bullet> bullets = new Array<>();
-    public static final Pool<Bullet> bulletPool = new Pool<Bullet>() {
+    public static volatile Array<Bullet> bullets = new Array<>();
+    public static volatile Pool<Bullet> bulletPool = new Pool<Bullet>() {
         @Override
         protected Bullet newObject() {
             return new Bullet();

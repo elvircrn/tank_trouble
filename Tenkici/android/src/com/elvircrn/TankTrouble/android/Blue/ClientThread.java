@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-import com.elvircrn.TankTrouble.android.FPSCounter;
 import com.elvircrn.TankTrouble.android.GameMaster;
 
 import java.io.IOException;
@@ -71,8 +70,6 @@ public class ClientThread extends Thread {
 
         BTManager.handshake = new ManageConnectThread(bluetoothSocket);
         BTManager.handshake.start();
-
-        FPSCounter.extraMessage = "HANDSHAKE";
 
         running = false;
 
