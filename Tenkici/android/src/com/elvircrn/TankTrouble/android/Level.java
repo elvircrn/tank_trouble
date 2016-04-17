@@ -229,7 +229,7 @@ public class Level {
                                   "getMapPixelWidth(): " + Integer.toString(getMapPixelWidth()));
 
         newWalls.add(new Wall((int)offset.x - wallWidth, (int) Graphics.prefferedHeight - wallWidth, getMapPixelWidth() + wallWidth, 2 * wallWidth, HORIZONTAL));
-        newWalls.add(new Wall((int)offset.x + getMapPixelWidth() - wallWidth, 0, wallWidth, getMapPixelHeight(), VERTICAL));
+        newWalls.add(new Wall((int)offset.x + getMapPixelWidth() - wallWidth, 0, wallWidth, wallWidth + getMapPixelHeight(), VERTICAL));
         newWalls.add(new Wall((int)offset.x, 0, getMapPixelWidth(), wallWidth, HORIZONTAL));
 
         for (Wall wall : newWalls)

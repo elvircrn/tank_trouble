@@ -74,7 +74,7 @@ public class Tank {
         this.width = tankWidth;
         this.height = tankHeight;
         this.initCollisionCircle();
-        this.moveDirection.set(0, 1);
+        this.moveDirection.set(1, 0);
 
         this.reloadTime = Tank.defaultReloadTime;
         this.currentAmmo = Tank.defaultMaxAmmo;
@@ -96,7 +96,7 @@ public class Tank {
         this.width = tankWidth;
         this.height = tankHeight * Graphics.heightRatio();
         this.initCollisionCircle();
-        this.moveDirection.set(0, 1);
+        this.moveDirection.set(1, 0);
 
         this.reloadTime = Tank.defaultReloadTime;
         this.currentAmmo = Tank.defaultMaxAmmo;
