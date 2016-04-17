@@ -19,8 +19,8 @@ public class Tenkici extends ApplicationAdapter  {
 
     //region old
 
-	static SpriteBatch batch;
-    static AssetManager manager;
+	public static SpriteBatch batch;
+    public static AssetManager manager;
 
     public static OrthographicCamera cam;
     public static FreeTypeFontGenerator generator;
@@ -91,7 +91,6 @@ public class Tenkici extends ApplicationAdapter  {
         generator = new FreeTypeFontGenerator(Gdx.files.internal("data/ProFontWindows.ttf"));
         font16 = generator.generateFont(fontParameters);
         batch = new SpriteBatch();
-        manager = new AssetManager();
 
         //TODO: FONT SCALING
         fontParametersRed = new FreeTypeFontGenerator.FreeTypeFontParameter();

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.elvircrn.TankTrouble.android.Blue.ClientActivity;
@@ -45,10 +46,19 @@ public class AndroidLauncher extends AndroidApplication implements Tenkici.MyGam
 
 		//Fix race condition imposed by AndroidGraphics
 		Gdx.graphics.requestRendering();
+		Tenkici.manager.dispose();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		Tenkici.manager.dispose();
+		Tenkici.updateManager = false;
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Tenkici.manager = new AssetManager();
 	}
 }
